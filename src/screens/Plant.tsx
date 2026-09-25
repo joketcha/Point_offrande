@@ -5,6 +5,7 @@ import { allModes, effectiveEta, expectedModeCost, isRedundant, monthlyCapacity,
 import { STRATEGY_LABEL, type ModePolicy, type Strategy } from '../engine/types';
 import { activeSite, useGameState } from '../store/game';
 import { StatusPill } from '../ui/Charts';
+import { ConfirmButton } from '../ui/Pedagogy';
 
 const fmt = (x: number, d = 0) => x.toLocaleString('fr-FR', { maximumFractionDigits: d, minimumFractionDigits: d });
 
@@ -63,9 +64,9 @@ export function Plant() {
                   <b>{p.title}</b> <span className="pill">{fmt(p.cost / 1e6)} M FCFA</span>
                   <div className="sub">{p.description}</div>
                   {av.ok ? (
-                    <button className="btn small primary" style={{ marginTop: 6 }} onClick={() => confirm(`Lancer « ${p.title} » pour ${fmt(p.cost / 1e6)} M FCFA ?`) && dispatch({ type: 'project', id: p.id })}>
-                      Lancer
-                    </button>
+                    <div style={{ marginTop: 6 }}>
+                      <ConfirmButton className="btn small" label="Lancer" confirmLabel={`Engager ${fmt(p.cost / 1e6)} M FCFA`} onConfirm={() => dispatch({ type: 'project', id: p.id })} />
+                    </div>
                   ) : (
                     <div className="sub">
                       <i>{av.reason}</i>

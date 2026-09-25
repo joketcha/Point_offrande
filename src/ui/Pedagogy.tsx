@@ -337,3 +337,25 @@ export function NumberInput({ value, onChange, label, suffix, step = 'any' }: { 
     </label>
   );
 }
+
+/** Bouton à confirmation en deux clics (pas de boîte de dialogue navigateur : fonctionne aussi en iframe). */
+export function ConfirmButton({ label, confirmLabel, onConfirm, className = 'btn' }: { label: ReactNode; confirmLabel: string; onConfirm: () => void; className?: string }) {
+  const [armed, setArmed] = useState(false);
+  return armed ? (
+    <span className="row">
+      <button className={`${className} primary`} onClick={() => { setArmed(false); onConfirm(); }}>
+        {confirmLabel}
+      </button>
+      <button className="btn small ghost" onClick={() => setArmed(false)}>
+        Annuler
+      </button>
+    </span>
+  ) : (
+    <button className={className} onClick={() => setArmed(true)}>
+      {label}
+    </button>
+  );
+}
+
+/** Vrai quand le jeu tourne dans un cadre (page publiée) : impression et téléchargement y sont bloqués. */
+export const IN_FRAME = typeof window !== 'undefined' && window.self !== window.top;

@@ -7,7 +7,7 @@ import { TAKEOVER_MONTHS } from '../engine/takeover';
 import type { MonthKpi } from '../engine/types';
 import { activeSite, useGameState } from '../store/game';
 import { LineChart, Meter, Sparkline, StatusPill } from '../ui/Charts';
-import { MentorLine } from '../ui/Pedagogy';
+import { ConfirmButton, IN_FRAME, MentorLine } from '../ui/Pedagogy';
 
 const pct = (x: number, d = 1) => `${(x * 100).toFixed(d)} %`;
 const mf = (x: number) => `${(x / 1e6).toFixed(0)} M`;
@@ -57,9 +57,7 @@ export function Cockpit({ nav }: { nav: Nav }) {
       {isTakeover && (
         <div className="callout bad">
           <b>TAKE OVER THE FACTORY</b> — {def.name}. Mois {plant.month} / {TAKEOVER_MONTHS}. Pilotez l’usine (écran Usine : stratégies, projets, magasin) et avancez mois par mois.
-          <button className="btn small ghost" style={{ marginLeft: 8 }} onClick={() => confirm('Abandonner l’épreuve ?') && dispatch({ type: 'takeover-abandon' })}>
-            Abandonner
-          </button>
+          <ConfirmButton className="btn small ghost" label="Abandonner" confirmLabel="Confirmer l’abandon" onConfirm={() => dispatch({ type: 'takeover-abandon' })} />
         </div>
       )}
       {game.takeover?.finished && game.takeover.verdict && !isTakeover && <TakeoverVerdictCard />}
@@ -71,9 +69,11 @@ export function Cockpit({ nav }: { nav: Nav }) {
           </div>
         </div>
         <div className="row">
-          <button className="btn ghost no-print" onClick={() => window.print()}>
-            Rapport PDF
-          </button>
+          {!IN_FRAME && (
+            <button className="btn ghost no-print" onClick={() => window.print()}>
+              Rapport PDF
+            </button>
+          )}
           <button className="btn primary" onClick={() => dispatch({ type: 'advance' })} disabled={!!plant.pendingDecision || (isTakeover && plant.month >= TAKEOVER_MONTHS)}>
             Simuler le mois {plant.month + 1} →
           </button>

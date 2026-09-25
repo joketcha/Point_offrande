@@ -15,6 +15,7 @@ import {
 import { exportSave } from '../store/persistence';
 import { useGame, useGameState } from '../store/game';
 import { Meter, Radar } from '../ui/Charts';
+import { ConfirmButton, IN_FRAME } from '../ui/Pedagogy';
 
 export function Profile({ nav }: { nav: Nav }) {
   const { game, dispatch } = useGameState();
@@ -208,12 +209,12 @@ export function Profile({ nav }: { nav: Nav }) {
         <h3>Sauvegarde</h3>
         <p className="small muted">Sauvegarde automatique dans ce navigateur. Exportez un fichier pour changer d’appareil ou archiver.</p>
         <div className="row">
-          <button className="btn" onClick={download}>
-            Exporter (JSON)
-          </button>
-          <button className="btn danger" onClick={() => confirm('Effacer définitivement la partie ?') && rawDispatch({ type: 'reset' })}>
-            Nouvelle partie
-          </button>
+          {!IN_FRAME && (
+            <button className="btn" onClick={download}>
+              Exporter (JSON)
+            </button>
+          )}
+          <ConfirmButton className="btn danger" label="Nouvelle partie" confirmLabel="Effacer définitivement la partie" onConfirm={() => rawDispatch({ type: 'reset' })} />
         </div>
       </div>
     </div>
