@@ -213,7 +213,7 @@ export function AmdecMission({ meta, onExit }: MissionProps) {
           }}
           onDone={flow.done}
         >
-          <Choice multi value={prio} onChange={setPrio} options={MODES.map((m) => ({ id: m.id, label: `${m.id} — ${m.name}`, sub: `RPN ${rpn(m.id)}` }))} />
+          <Choice shuffleSeed={893} multi value={prio} onChange={setPrio} options={MODES.map((m) => ({ id: m.id, label: `${m.id} — ${m.name}`, sub: `RPN ${rpn(m.id)}` }))} />
         </Decision>
       )}
       {flow.index === 3 && (

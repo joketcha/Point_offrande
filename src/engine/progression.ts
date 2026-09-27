@@ -321,6 +321,11 @@ export const ERROR_LABEL: Record<string, string> = {
   'series-parallel': 'Confusion série / parallèle',
   'tco-capex-only': 'Choix d’investissement sur le seul prix d’achat',
   'vague-task': 'Gamme de maintenance vague (non exécutable)',
+  'signature-misread': 'Signature vibratoire mal interprétée',
+  'single-technique': 'Diagnostic posé sur une seule technique',
+  'rul-misread': 'Durée de vie résiduelle (RUL) mal estimée',
+  'intervene-too-early': 'Intervention trop précoce (potentiel de vie gaspillé)',
+  'intervene-too-late': 'Intervention trop tardive (risque de défaillance fonctionnelle)',
 };
 
 /** Recommande les prochaines missions en ciblant les compétences les plus faibles. */

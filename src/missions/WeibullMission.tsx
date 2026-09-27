@@ -193,6 +193,7 @@ export function WeibullMission({ meta, onExit }: MissionProps) {
           onDone={flow.done}
         >
           <Choice<FailureRegime>
+            shuffleSeed={673}
             value={regime as FailureRegime[]}
             onChange={(v) => setRegime(v)}
             options={(['infant', 'random', 'wearout'] as FailureRegime[]).map((r) => ({ id: r, label: REGIME_LABEL[r] }))}
@@ -275,7 +276,7 @@ export function WeibullMission({ meta, onExit }: MissionProps) {
           }}
           onDone={flow.done}
         >
-          <Choice
+          <Choice shuffleSeed={890}
             multi
             value={strat}
             onChange={setStrat}

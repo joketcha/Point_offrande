@@ -7,6 +7,7 @@ export type ModuleId =
   | 'amdec'
   | 'rcm'
   | 'pf'
+  | 'diagnostic'
   | 'rca'
   | 'spares'
   | 'crise'
@@ -45,6 +46,7 @@ export const MODULE_LABEL: Record<ModuleId, string> = {
   amdec: 'AMDEC / FMECA',
   rcm: 'RCM / MBF',
   pf: 'Intervalle P-F',
+  diagnostic: 'Diagnostic conditionnel',
   rca: 'RCA — Analyse des causes racines',
   spares: 'Pièces de rechange',
   crise: 'Mode Crise',
@@ -236,6 +238,31 @@ export const MISSIONS: MissionMeta[] = [
       { mentor: 'mecano', text: 'Depuis qu’on ne fait plus l’alignement au laser, les garnitures tiennent trois mois.' },
     ],
     plantEffect: 'Alignement laser post-intervention standardisé : cause latente « désalignement » éliminée.',
+  },
+  {
+    id: 'diag-vibratoire',
+    module: 'diagnostic',
+    title: 'Centre de diagnostic : lire le signal',
+    subtitle: 'Spectre, huile, thermographie → défaut, RUL et décision',
+    tier: 3,
+    minLevel: 3,
+    xp: 300,
+    skills: ['PREDICTIVE', 'RELIABILITY', 'DATA', 'MAINTENANCE'],
+    errorTags: ['signature-misread', 'single-technique', 'rul-misread', 'intervene-too-early', 'intervene-too-late'],
+    briefing: {
+      context:
+        "Le centre de diagnostic vous transmet une alerte sur un équipement tournant critique. Vous disposez du spectre vibratoire, d'une analyse d'huile et d'une mesure thermographique. Il faut identifier le défaut, le confirmer par recoupement, estimer la durée de vie résiduelle (RUL) et décider : intervenir maintenant, planifier, ou continuer à surveiller.",
+      data: ['Spectre vibratoire (ordres de rotation 1×, 2×, 3×…, hautes fréquences)', 'Analyse d’huile (fer, viscosité)', 'Thermographie palier/accouplement', 'Deux relevés successifs (tendance)', 'Délai d’appro de la pièce'],
+      constraints: ['Une seule technique ne suffit pas à conclure', 'La décision dépend de la RUL ET du délai de réaction', 'Arrêt de production coûteux'],
+      objectives: ['Identifier le défaut dominant', 'Le confirmer par une seconde technique', 'Estimer la RUL', 'Choisir la bonne action au bon moment'],
+      pressure: 'La Production veut savoir tout de suite si elle doit s’arrêter ou non.',
+    },
+    debate: [
+      { mentor: 'data', text: 'Un seul pic ne fait pas un diagnostic. Recoupe tes sources.' },
+      { mentor: 'mecano', text: 'Un roulement qui chante en haute fréquence, je l’entends avant de le voir sur ton écran.' },
+      { mentor: 'prod', text: 'Dis-moi juste : je m’arrête ou pas ?' },
+    ],
+    plantEffect: 'Compétences de diagnostic conditionnel renforcées (spectre, huile, thermographie, RUL).',
   },
   {
     id: 'rca-convoyeur',

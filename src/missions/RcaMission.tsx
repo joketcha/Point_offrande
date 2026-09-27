@@ -182,7 +182,7 @@ export function RcaMission({ meta, onExit }: MissionProps) {
                 <h4>
                   Pourquoi n°{i + 1} : {w.q}
                 </h4>
-                <Choice value={whys[i]} onChange={(v) => setWhys(whys.map((x, j) => (j === i ? v : x)))} options={w.options.map((o) => ({ id: o.id, label: o.label }))} />
+                <Choice shuffleSeed={546} value={whys[i]} onChange={(v) => setWhys(whys.map((x, j) => (j === i ? v : x)))} options={w.options.map((o) => ({ id: o.id, label: o.label }))} />
               </div>
             ))}
           </div>
@@ -252,7 +252,7 @@ export function RcaMission({ meta, onExit }: MissionProps) {
           }}
           onDone={flow.done}
         >
-          <Choice multi value={acts} onChange={setActs} options={ACTIONS.map((a) => ({ id: a.id, label: a.label }))} />
+          <Choice shuffleSeed={201} multi value={acts} onChange={setActs} options={ACTIONS.map((a) => ({ id: a.id, label: a.label }))} />
         </Decision>
       )}
     </div>

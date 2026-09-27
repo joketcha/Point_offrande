@@ -3,6 +3,7 @@ import type { Nav } from '../App';
 import { MENTORS } from '../data/mentors';
 import { policyWarnings } from '../engine/effects';
 import { industrialImpact, promotionStatus, recommendMissions } from '../engine/progression';
+import { monthDebrief } from '../engine/simulation';
 import { TAKEOVER_MONTHS } from '../engine/takeover';
 import type { MonthKpi } from '../engine/types';
 import { activeSite, useGameState } from '../store/game';
@@ -125,6 +126,8 @@ export function Cockpit({ nav }: { nav: Nav }) {
         Ne regardez jamais un KPI isolément : un coût maintenance qui baisse avec des pertes de production qui montent n’est pas une économie.
       </div>
 
+      {last && <DebriefPanel />}
+
       {k.length > 0 && (
         <div className="grid-2 section">
           <div className="card">
@@ -231,6 +234,55 @@ export function Cockpit({ nav }: { nav: Nav }) {
       </div>
 
       {plant.pendingDecision && <PressureModal />}
+    </div>
+  );
+}
+
+function DebriefPanel() {
+  const { game } = useGameState();
+  const { def, plant } = activeSite(game);
+  const [open, setOpen] = useState(true);
+  const d = monthDebrief(def, plant);
+  if (!d) return null;
+  return (
+    <div className="card section">
+      <div className="card-title">
+        <h3>Débriefing du mois {d.month} — d’où viennent les résultats</h3>
+        <button className="btn small ghost" onClick={() => setOpen(!open)}>
+          {open ? 'Réduire' : 'Détailler'}
+        </button>
+      </div>
+      <ul className="small" style={{ marginTop: 0 }}>
+        {d.drivers.map((x, i) => (
+          <li key={i}>{x}</li>
+        ))}
+      </ul>
+      {open && d.topContributors.length > 0 && (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Équipement</th>
+                <th className="num">Pannes</th>
+                <th className="num">Coût + pertes</th>
+                <th className="num">Part</th>
+              </tr>
+            </thead>
+            <tbody>
+              {d.topContributors.map((c) => (
+                <tr key={c.tag}>
+                  <td>
+                    {c.tag} — {c.name}
+                  </td>
+                  <td className="num">{c.count}</td>
+                  <td className="num">{mf(c.loss)}</td>
+                  <td className="num">{Math.round(c.share * 100)} %</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

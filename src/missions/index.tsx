@@ -4,6 +4,7 @@ import { AmdecMission } from './AmdecMission';
 import { ComiteMission } from './ComiteMission';
 import type { MissionProps } from './common';
 import { CrisisMission } from './CrisisMission';
+import { DiagnosticMission } from './DiagnosticMission';
 import { GmaoMission } from './GmaoMission';
 import { KpiMission } from './KpiMission';
 import { PfMission } from './PfMission';
@@ -25,6 +26,7 @@ const REGISTRY: Record<string, ComponentType<MissionProps>> = {
   'rcm-p101': RcmMission,
   'rca-convoyeur': RcaMission,
   'pf-sertisseuse': PfMission,
+  'diag-vibratoire': DiagnosticMission,
   'comite-pdm': ComiteMission,
   'systemes-froid': SystemsMission,
   'tco-compresseur': TcoMission,

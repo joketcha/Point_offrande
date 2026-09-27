@@ -581,6 +581,53 @@ export function paretoByEquipment(def: PlantDef, events: FailureEvent[]) {
   return [...map.values()].sort((a, b) => b.loss - a.loss);
 }
 
+export interface MonthDebrief {
+  month: number;
+  totalLoss: number;
+  waitLoss: number;
+  waitShare: number;
+  stockoutEvents: number;
+  topContributors: { tag: string; name: string; loss: number; count: number; share: number }[];
+  drivers: string[];
+}
+
+/**
+ * Explique un mois : d'où viennent les pertes, ce qui a changé vs le mois précédent.
+ * Répond à « pourquoi mes résultats bougent ? » sans que le joueur ait à fouiller le REX.
+ */
+export function monthDebrief(def: PlantDef, state: PlantState, month?: number): MonthDebrief | null {
+  const m = month ?? state.month;
+  const kpi = state.kpis.find((k) => k.month === m);
+  if (!kpi) return null;
+  const prev = state.kpis.find((k) => k.month === m - 1);
+  const events = state.events.filter((e) => e.month === m);
+  const failures = events.filter((e) => e.kind === 'panne' || e.kind === 'induite');
+  const totalLoss = kpi.productionLoss;
+  const waitLoss = failures.reduce((a, e) => a + (e.waitParts > 0 ? (e.waitParts / Math.max(e.downtime, 1)) * e.loss : 0), 0);
+  const stockoutEvents = failures.filter((e) => e.waitParts > 0).length;
+  const pareto = paretoByEquipment(def, events);
+  const lossSum = pareto.reduce((a, e) => a + e.loss, 0) || 1;
+  const topContributors = pareto.slice(0, 3).map((e) => ({ tag: e.tag, name: e.name, loss: e.loss, count: e.count, share: e.loss / lossSum }));
+
+  const drivers: string[] = [];
+  if (topContributors[0] && topContributors[0].share > 0.3)
+    drivers.push(`${topContributors[0].tag} concentre ${Math.round(topContributors[0].share * 100)} % des pertes (${topContributors[0].count} panne(s)).`);
+  if (waitLoss > totalLoss * 0.25 && totalLoss > 0)
+    drivers.push(`${Math.round((waitLoss / totalLoss) * 100)} % des pertes viennent d'attentes de pièces (${stockoutEvents} rupture(s)) : revoyez les stocks critiques.`);
+  const repeats = failures.filter((e) => e.repeat).length;
+  if (repeats > 0) drivers.push(`${repeats} panne(s) répétitive(s) : une cause latente n'est pas traitée (voir RCA/AMDEC).`);
+  if (prev) {
+    const dA = (kpi.availability - prev.availability) * 100;
+    if (Math.abs(dA) >= 1.5) drivers.push(`Disponibilité ${dA > 0 ? '+' : ''}${dA.toFixed(1)} pt vs mois précédent.`);
+    const dPm = kpi.pmCompliance - prev.pmCompliance;
+    if (dPm < -0.15) drivers.push(`Conformité préventive en baisse (${Math.round(kpi.pmCompliance * 100)} %) : équipe surchargée ou pièces manquantes.`);
+  }
+  if (kpi.backlogWeeks > 6) drivers.push(`Backlog élevé (${kpi.backlogWeeks.toFixed(1)} sem.) : le correctif mange la capacité, le préventif décroche.`);
+  if (state.resolvedDefects.length > 0 && failures.length <= 4) drivers.push(`Peu de pannes ce mois : les causes latentes éliminées portent leurs fruits.`);
+  if (drivers.length === 0) drivers.push('Mois calme : aucun facteur dominant. Continuez à fiabiliser les modes critiques.');
+  return { month: m, totalLoss, waitLoss, waitShare: totalLoss > 0 ? waitLoss / totalLoss : 0, stockoutEvents, topContributors, drivers };
+}
+
 export function dormantStock(def: PlantDef, state: PlantState) {
   return def.parts
     .filter((p) => (state.stock[p.id] ?? 0) > 0 && state.month - (state.lastMovement[p.id] ?? 0) >= 12)

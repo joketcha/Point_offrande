@@ -181,7 +181,7 @@ export function CrisisMission({ meta, onExit }: MissionProps) {
           }}
           onDone={flow.done}
         >
-          <Choice value={choice} onChange={setChoice} options={OPTIONS.map((o) => ({ id: o.id, label: `${o.id}. ${o.label}`, sub: `E[arrêt] à calculer · HSE ${o.hse}` }))} />
+          <Choice shuffleSeed={62} value={choice} onChange={setChoice} options={OPTIONS.map((o) => ({ id: o.id, label: `${o.id}. ${o.label}`, sub: `E[arrêt] à calculer · HSE ${o.hse}` }))} />
         </Decision>
       )}
       {flow.index === 2 && (
@@ -208,7 +208,7 @@ export function CrisisMission({ meta, onExit }: MissionProps) {
           }}
           onDone={flow.done}
         >
-          <Choice
+          <Choice shuffleSeed={678}
             multi
             value={compl}
             onChange={setCompl}
@@ -241,7 +241,7 @@ export function CrisisMission({ meta, onExit }: MissionProps) {
           }
           onDone={flow.done}
         >
-          <Choice
+          <Choice shuffleSeed={640}
             value={msg}
             onChange={setMsg}
             options={[

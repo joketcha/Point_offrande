@@ -165,7 +165,7 @@ export function SparesMission({ meta, onExit }: MissionProps) {
             <NumberInput label="Risque annuel espéré sans stock" suffix="M FCFA/an" value={risk} onChange={setRisk} />
           </div>
           <div style={{ marginTop: 10 }}>
-            <Choice
+            <Choice shuffleSeed={166}
               value={bvDecision}
               onChange={setBvDecision}
               options={[
@@ -226,7 +226,7 @@ export function SparesMission({ meta, onExit }: MissionProps) {
           }}
           onDone={flow.done}
         >
-          <Choice
+          <Choice shuffleSeed={463}
             multi
             value={stockSet}
             onChange={setStockSet}

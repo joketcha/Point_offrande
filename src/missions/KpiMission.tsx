@@ -1,35 +1,36 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { Rng, hashSeed } from '../engine/rng';
+import { useGameState } from '../store/game';
 import { Briefing, Choice, Debrief, Decision, NumberInput, Stepper, near, useSteps } from '../ui/Pedagogy';
 import { type MissionProps, fmt, num, useFinish } from './common';
 
-const EVENTS = [
-  { d: '08/01', desc: 'Bourrage sortie laveuse', rep: 0.6, wait: 0 },
-  { d: '21/01', desc: 'Bourrage courbe 90°', rep: 0.8, wait: 0 },
-  { d: '03/02', desc: 'Guide déréglé', rep: 0.5, wait: 0 },
-  { d: '17/02', desc: 'Chaîne sortie de guide', rep: 1.2, wait: 0 },
-  { d: '02/03', desc: 'Bourrage courbe 90°', rep: 0.7, wait: 0 },
-  { d: '19/03', desc: 'Capteur accumulation', rep: 0.9, wait: 0 },
-  { d: '04/04', desc: 'Casse roulement motoréducteur', rep: 3.5, wait: 36 },
-  { d: '15/04', desc: 'Bourrage courbe 90°', rep: 0.6, wait: 0 },
-  { d: '29/04', desc: 'Guide déréglé', rep: 0.75, wait: 0 },
-  { d: '12/05', desc: 'Bourrage sortie laveuse', rep: 0.5, wait: 0 },
-  { d: '24/05', desc: 'Casse roulement motoréducteur', rep: 4.0, wait: 20 },
-  { d: '06/06', desc: 'Bourrage courbe 90°', rep: 0.8, wait: 0 },
-  { d: '18/06', desc: 'Guide déréglé', rep: 0.6, wait: 0 },
-  { d: '27/06', desc: 'Bourrage courbe 90°', rep: 0.7, wait: 0 },
-];
 const RUN = 560 * 6;
-const N = EVENTS.length;
-const SUM_REP = EVENTS.reduce((a, e) => a + e.rep, 0);
-const SUM_DOWN = EVENTS.reduce((a, e) => a + e.rep + e.wait, 0);
-const MTBF = RUN / N;
-const MTTR = SUM_REP / N;
-const MDT = SUM_DOWN / N;
-const AVAIL = RUN / (RUN + SUM_DOWN);
+const SMALL = ['Bourrage sortie laveuse', 'Bourrage courbe 90°', 'Guide déréglé', 'Capteur accumulation', 'Chaîne sortie de guide', 'Micro-arrêt transfert'];
+
+/** Génère un historique différent à chaque tentative : bourrages courts fréquents + 2-3 casses roulement avec attente pièce. */
+function buildEvents(seed: number) {
+  const rng = new Rng(seed);
+  const nSmall = rng.int(9, 12);
+  const nBig = rng.int(2, 3);
+  const evs: { d: string; desc: string; rep: number; wait: number }[] = [];
+  const day = () => `${String(rng.int(1, 28)).padStart(2, '0')}/${String(rng.int(1, 6)).padStart(2, '0')}`;
+  for (let i = 0; i < nSmall; i++) evs.push({ d: day(), desc: rng.pick(SMALL), rep: +rng.uniform(0.4, 1.2).toFixed(1), wait: 0 });
+  for (let i = 0; i < nBig; i++) evs.push({ d: day(), desc: 'Casse roulement motoréducteur', rep: +rng.uniform(3, 4.5).toFixed(1), wait: rng.int(18, 40) });
+  return evs.sort((a, b) => (a.d.slice(3) + a.d.slice(0, 2)).localeCompare(b.d.slice(3) + b.d.slice(0, 2)));
+}
 
 export function KpiMission({ meta, onExit }: MissionProps) {
+  const { game } = useGameState();
   const flow = useSteps(4);
   const finish = useFinish(meta, onExit);
+  const EVENTS = useMemo(() => buildEvents(hashSeed(`kpi|${game.plant.seed}|${game.player.attempts[meta.id] ?? 0}`)), [game.plant.seed, game.player.attempts, meta.id]);
+  const N = EVENTS.length;
+  const SUM_REP = EVENTS.reduce((a, e) => a + e.rep, 0);
+  const SUM_DOWN = EVENTS.reduce((a, e) => a + e.rep + e.wait, 0);
+  const MTBF = RUN / N;
+  const MTTR = SUM_REP / N;
+  const MDT = SUM_DOWN / N;
+  const AVAIL = RUN / (RUN + SUM_DOWN);
   const [mtbf, setMtbf] = useState('');
   const [mttr, setMttr] = useState('');
   const [mdt, setMdt] = useState('');
@@ -150,7 +151,7 @@ export function KpiMission({ meta, onExit }: MissionProps) {
             return {
               ok: false,
               errorTag: 'kpi-isolated',
-              consequence: concl[0] === 'a' ? 'Le convoyeur reste hors radar. Les bourrages continuent : ~2 arrêts par mois et 2 casses roulement coûteuses.' : 'Vous traitez un seul aspect ; l’autre continue de coûter.',
+              consequence: concl[0] === 'a' ? 'Le convoyeur reste hors radar. Les bourrages continuent, et les casses roulement coûteuses aussi.' : 'Vous traitez un seul aspect ; l’autre continue de coûter.',
               question: 'Un MTTR faible dit-il quelque chose sur la fréquence des arrêts ? Et sur l’attente pièces ?',
               hints: ['Regardez les deux familles d’événements : bourrages fréquents et courts, casses rares et longues.', 'Le temps d’arrêt total est dominé par… ?'],
               method: 'Ne jamais lire un KPI isolément : MTBF (fréquence) × MDT (durée) = indisponibilité. Chercher la famille de causes dominante (Pareto).',
@@ -158,13 +159,13 @@ export function KpiMission({ meta, onExit }: MissionProps) {
           }}
           onDone={flow.done}
         >
-          <Choice
+          <Choice shuffleSeed={422}
             value={concl}
             onChange={setConcl}
             options={[
               { id: 'a', label: '« MTTR de 45 min : le convoyeur est excellent, concentrons-nous ailleurs. »' },
               { id: 'b', label: '« Il faut former les techniciens pour réduire le MTTR. »' },
-              { id: 'c', label: `« MTBF ${fmt(MTBF)} h : 12 bourrages courts (réglages non standard) + 2 casses roulement dont 56 h d’attente pièce = ${fmt(((SUM_DOWN - SUM_REP) / SUM_DOWN) * 100)} % de l’arrêt. Actions : standard de réglage aux changements de format, et stock de roulements + RCA sur les casses. »` },
+              { id: 'c', label: `« MTBF ${fmt(MTBF)} h : ${EVENTS.filter((e) => e.wait === 0).length} bourrages courts (réglages non standard) + ${EVENTS.filter((e) => e.wait > 0).length} casses roulement dont ${fmt(EVENTS.reduce((a, e) => a + e.wait, 0))} h d’attente pièce = ${fmt(((SUM_DOWN - SUM_REP) / SUM_DOWN) * 100)} % de l’arrêt. Actions : standard de réglage aux changements de format, et stock de roulements + RCA sur les casses. »` },
               { id: 'd', label: '« Remplaçons le convoyeur. »' },
             ]}
           />

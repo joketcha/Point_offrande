@@ -71,7 +71,7 @@ export function RcmMission({ meta, onExit }: MissionProps) {
           }
           onDone={flow.done}
         >
-          <Choice
+          <Choice shuffleSeed={678}
             value={fn}
             onChange={setFn}
             options={[
@@ -105,7 +105,7 @@ export function RcmMission({ meta, onExit }: MissionProps) {
           onDone={flow.done}
         >
           <h4>Défaillances fonctionnelles</h4>
-          <Choice
+          <Choice shuffleSeed={477}
             multi
             value={ff}
             onChange={setFf}
@@ -117,7 +117,7 @@ export function RcmMission({ meta, onExit }: MissionProps) {
             ]}
           />
           <h4 style={{ marginTop: 12 }}>Modes de défaillance</h4>
-          <Choice
+          <Choice shuffleSeed={335}
             multi
             value={modes}
             onChange={setModes}
@@ -272,7 +272,7 @@ export function RcmMission({ meta, onExit }: MissionProps) {
           }}
           onDone={flow.done}
         >
-          <Choice
+          <Choice shuffleSeed={183}
             multi
             value={q7}
             onChange={setQ7}

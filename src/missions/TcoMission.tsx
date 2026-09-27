@@ -138,7 +138,7 @@ export function TcoMission({ meta, onExit }: MissionProps) {
           }
           onDone={flow.done}
         >
-          <Choice value={pick} onChange={setPick} options={OFFERS.map((o) => ({ id: o.id, label: o.name }))} />
+          <Choice shuffleSeed={100} value={pick} onChange={setPick} options={OFFERS.map((o) => ({ id: o.id, label: o.name }))} />
         </Decision>
       )}
     </div>

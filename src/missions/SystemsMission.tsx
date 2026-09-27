@@ -180,7 +180,7 @@ export function SystemsMission({ meta, onExit }: MissionProps) {
           }}
           onDone={flow.done}
         >
-          <Choice value={arch} onChange={setArch} options={ARCHI.map((a) => ({ id: a.id, label: a.label }))} />
+          <Choice shuffleSeed={857} value={arch} onChange={setArch} options={ARCHI.map((a) => ({ id: a.id, label: a.label }))} />
         </Decision>
       )}
     </div>

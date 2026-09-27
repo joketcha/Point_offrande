@@ -3,11 +3,15 @@
  * En cas d'erreur : 1) conséquence  2) question  3) raisonnement demandé
  * 4) indices progressifs  5) méthode  6) bonne pratique  7) refaire la décision.
  */
-import { useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { MENTORS } from '../data/mentors';
 import type { MissionMeta } from '../data/missions';
 import { ERROR_LABEL, SKILL_LABEL, missionScore, stepScore } from '../engine/progression';
+import { Rng } from '../engine/rng';
 import type { MentorId, SkillId, StepResult } from '../engine/types';
+import { evaluateReasoning } from './reasoning';
+
+export { evaluateReasoning };
 
 export interface Verdict {
   ok: boolean;
@@ -126,6 +130,15 @@ export function Decision({ id, title, skills, prompt, children, check, onDone, m
             Explique ton raisonnement (ce que tu as supposé, ce que tu vas changer) :
             <textarea value={reasoning} onChange={(e) => setReasoning(e.target.value)} placeholder="J’avais considéré que… Je n’avais pas vérifié… Je vais…" />
           </label>
+          {reasoning.trim().length >= 15 &&
+            (() => {
+              const ev = evaluateReasoning(reasoning);
+              return (
+                <div className={`callout small ${ev.level === 2 ? 'good' : ev.level === 0 ? 'bad' : 'info'}`} style={{ marginTop: 4 }} aria-live="polite">
+                  <b>Coach :</b> {ev.feedback}
+                </div>
+              );
+            })()}
           {shownHints.length > 0 && (
             <ol className="hint-list small" style={{ marginTop: 8 }}>
               {shownHints.map((h, i) => (
@@ -183,10 +196,29 @@ export interface ChoiceOption<T extends string = string> {
   sub?: ReactNode;
 }
 
-export function Choice<T extends string>({ options, value, onChange, multi }: { options: ChoiceOption<T>[]; value: T[]; onChange: (v: T[]) => void; multi?: boolean }) {
+export function Choice<T extends string>({
+  options,
+  value,
+  onChange,
+  multi,
+  shuffleSeed,
+}: {
+  options: ChoiceOption<T>[];
+  value: T[];
+  onChange: (v: T[]) => void;
+  multi?: boolean;
+  /** Mélange déterministe de l'ordre d'affichage : évite de repérer la bonne réponse par sa position. */
+  shuffleSeed?: number;
+}) {
+  const sig = options.map((o) => o.id).join('|');
+  const shown = useMemo(() => {
+    if (shuffleSeed === undefined) return options;
+    return new Rng(Math.round(Math.abs(shuffleSeed) * 1000) + options.length).shuffle(options);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sig, shuffleSeed]);
   return (
     <div className="options">
-      {options.map((o) => {
+      {shown.map((o) => {
         const on = value.includes(o.id);
         return (
           <button

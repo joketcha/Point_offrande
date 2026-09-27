@@ -241,7 +241,7 @@ export function GmaoMission({ meta, onExit }: MissionProps) {
           }}
           onDone={flow.done}
         >
-          <Choice
+          <Choice shuffleSeed={466}
             value={msg}
             onChange={setMsg}
             options={[

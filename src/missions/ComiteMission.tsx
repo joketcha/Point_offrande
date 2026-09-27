@@ -23,13 +23,14 @@ const ARGS: { id: string; label: string; weights: Partial<Record<MentorId, numbe
 const COMMITTEE: MentorId[] = ['dirind', 'daf', 'prod', 'hse', 'dirmaint'];
 
 export function ComiteMission({ meta, onExit }: MissionProps) {
-  const flow = useSteps(3);
+  const flow = useSteps(4);
   const finish = useFinish(meta, onExit);
   const [gain, setGain] = useState('');
   const [pb, setPb] = useState('');
   const [args, setArgs] = useState<string[]>([]);
   const [o1, setO1] = useState<string[]>([]);
   const [o2, setO2] = useState<string[]>([]);
+  const [pitch, setPitch] = useState('');
 
   if (flow.index === -1) return <Briefing meta={meta} onStart={flow.start} />;
   if (flow.finished) return <Debrief meta={meta} results={flow.results} onValidate={() => finish(flow.results)} />;
@@ -38,7 +39,7 @@ export function ComiteMission({ meta, onExit }: MissionProps) {
 
   return (
     <div>
-      <Stepper total={3} index={flow.index} />
+      <Stepper total={4} index={flow.index} />
       {flow.index === 0 && (
         <Decision
           id="Business case"
@@ -89,7 +90,7 @@ export function ComiteMission({ meta, onExit }: MissionProps) {
           }}
           onDone={flow.done}
         >
-          <Choice multi value={args} onChange={setArgs} options={ARGS.map((a) => ({ id: a.id, label: a.label }))} />
+          <Choice shuffleSeed={385} multi value={args} onChange={setArgs} options={ARGS.map((a) => ({ id: a.id, label: a.label }))} />
           <div className="row small" style={{ marginTop: 8 }}>
             {COMMITTEE.map((m) => (
               <span key={m} className="pill">
@@ -118,7 +119,7 @@ export function ComiteMission({ meta, onExit }: MissionProps) {
           onDone={flow.done}
         >
           <h4>DAF : « Et si ça ne marche pas ? »</h4>
-          <Choice
+          <Choice shuffleSeed={144}
             value={o1}
             onChange={setO1}
             options={[
@@ -128,7 +129,7 @@ export function ComiteMission({ meta, onExit }: MissionProps) {
             ]}
           />
           <h4 style={{ marginTop: 12 }}>Production : « Qui va regarder les alarmes ? »</h4>
-          <Choice
+          <Choice shuffleSeed={461}
             value={o2}
             onChange={setO2}
             options={[
@@ -137,6 +138,43 @@ export function ComiteMission({ meta, onExit }: MissionProps) {
               { id: 'c', label: '« Un analyste désigné, revue quotidienne de 10 min, OT créé automatiquement dans la GMAO, arrêt planifié au prochain changement de format. »' },
             ]}
           />
+        </Decision>
+      )}
+      {flow.index === 3 && (
+        <Decision
+          id="Pitch d’ouverture"
+          title="4. Vos 2 phrases d’ouverture au comité (texte libre)"
+          skills={['COMMUNICATION', 'LEADERSHIP']}
+          prompt={<p>Vous avez 30 secondes pour capter le comité. Rédigez l’accroche : elle doit tenir en une décision claire, appuyée par un chiffre et le risque évité. Le comité n’écoutera pas un exposé technique.</p>}
+          mentor={{ id: 'dirind', text: 'Dites-moi quoi faire, pourquoi, combien et quand — en deux phrases.' }}
+          check={() => {
+            const t = pitch.trim().toLowerCase();
+            const hasNumber = /\d/.test(t);
+            const hasMoney = /(fcfa|m |million|roi|retour|économ|econom|perte|évit|evit)/.test(t);
+            const hasRisk = /(risque|hse|sécurit|securit|panne|arrêt|arret|nh3|ammoniac)/.test(t);
+            const hasAsk = /(demande|approuv|autoris|valid|budget|investi|financ|35|décision|decision)/.test(t);
+            const tooLong = t.length > 400;
+            const score = (hasNumber ? 1 : 0) + (hasMoney ? 1 : 0) + (hasRisk ? 1 : 0) + (hasAsk ? 1 : 0);
+            if (score >= 3 && !tooLong && t.length >= 40)
+              return { ok: true, why: 'Accroche efficace : une demande claire, un bénéfice chiffré et le risque évité. C’est ce qui fait dire « oui » à un comité.' };
+            return {
+              ok: false,
+              errorTag: 'roi-missing',
+              consequence: tooLong ? 'Trop long : le comité décroche avant votre conclusion.' : 'Votre accroche ne donne pas au comité de quoi décider : ni chiffre, ni risque, ni demande claire.',
+              question: 'En une phrase : que demandez-vous, quel gain chiffré, et quel risque évitez-vous ?',
+              hints: [
+                'Structure : « Je demande X FCFA pour éviter Y FCFA de pertes/an et couvrir le risque Z. »',
+                `Chiffres disponibles : investissement ${CAPEX} M, gain ${fmt(GAIN)} M/an, retour ${fmt(PAYBACK, 1)} mois, risque NH3.`,
+              ],
+              method: 'Pitch de comité : demande + bénéfice chiffré + risque couvert, en deux phrases. Le détail technique vient seulement si on vous le demande.',
+            };
+          }}
+          onDone={flow.done}
+        >
+          <label className="field">
+            Votre accroche (2 phrases)
+            <textarea value={pitch} onChange={(e) => setPitch(e.target.value)} placeholder="Je demande 35 M FCFA pour installer… ce qui évite … M FCFA de pertes par an (retour en … mois) et couvre le risque …" />
+          </label>
         </Decision>
       )}
     </div>
