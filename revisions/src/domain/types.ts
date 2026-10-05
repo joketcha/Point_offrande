@@ -43,6 +43,8 @@ export interface Utilisateur {
   email?: string;
   perimetre: Perimetre;
   actif: boolean;
+  /** Empreinte SHA-256 du mot de passe (contrôle d'accès local, pas une sécurité serveur). */
+  motDePasseHash?: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -449,6 +451,13 @@ export interface Parametres {
   /** Préparation : nombre de mois avant révision. */
   moisPreparation: number;
   devise: string;
+  /**
+   * Mode de saisie : ADMIN = seuls les administrateurs saisissent, tous les autres
+   * profils sont en lecture (mise en route) ; ROLES = chaque métier saisit son domaine.
+   */
+  modeSaisie?: 'ADMIN' | 'ROLES';
+  /** Droits de modification par domaine, définis par l'administrateur (mode ROLES). */
+  droits?: Partial<Record<string, Role[]>>;
 }
 
 export interface Donnees {

@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "sites": [],
+  "ateliers": [],
+  "lignes": [],
+  "machines": [],
+  "sousEnsembles": [],
+  "organes": [],
+  "catalogue": [],
+  "utilisateurs": [
+    {
+      "id": "u-admin",
+      "nom": "Administrateur",
+      "role": "ADMIN",
+      "perimetre": {
+        "siteIds": [],
+        "atelierIds": [],
+        "ligneIds": []
+      },
+      "actif": true
+    }
+  ],
+  "revisions": [],
+  "gammes": [],
+  "imports": [],
+  "pdrs": [],
+  "interventions": [],
+  "travaux": [],
+  "incidents": [],
+  "stabilisation": [],
+  "rex": [],
+  "notifications": [],
+  "audit": [
+    {
+      "id": "AUD-0",
+      "horodatage": "2026-10-05T00:00",
+      "auteur": "Système",
+      "role": "ADMIN",
+      "entite": "Données",
+      "entiteId": "-",
+      "action": "INITIALISATION",
+      "detail": "Création d'une base vide (mise en service)"
+    }
+  ],
+  "parametres": {
+    "margePdrJours": 14,
+    "delaiFretJours": 35,
+    "delaiFretAerienJours": 5,
+    "delaiAbidjanUsineJours": 7,
+    "delaiReceptionJours": 3,
+    "delaiConfirmationJours": 7,
+    "moisPreparation": 7,
+    "devise": "FCFA",
+    "modeSaisie": "ADMIN"
+  }
+}

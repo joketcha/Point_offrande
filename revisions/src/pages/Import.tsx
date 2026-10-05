@@ -3,6 +3,7 @@ import { codeLigne } from '../domain/arbo';
 import { fmt } from '../domain/dates';
 import { analyserTableau, comparerGammes, COLONNES, nouvelleVersion, synchroniserPdr, type ResultatImport } from '../domain/importGamme';
 import { STATUTS } from '../domain/referentiel';
+import { assurerNoeud } from '../domain/importReferentiel';
 import type { GammeLigne } from '../domain/types';
 import { nouvelId, useStore } from '../store/store';
 import { Card, Lien, Vide, csv, telecharger } from '../ui/kit';
@@ -139,6 +140,8 @@ export default function ImportGamme() {
           dr.imports.push({ id: nouvelId('IMP'), date: today, auteur: user.nom, fichier, ligneId: p.lid, gammeVersionId: id, nbLignes: p.lignes.length, nbErreurs: 0, nbAvertissements: res.nbAvertissements, resultat: 'IMPORTE', resume: `Version ${version.version} : +${p.diff.ajoutees.length} ajoutée(s), −${p.diff.retirees.length} retirée(s), ${p.diff.modifiees.length} modifiée(s)` });
           resume.push(`${codeLigne(dr, p.lid)} v${version.version}`);
           // Catalogue : références inconnues ajoutées (jamais écrasées).
+          // Arborescence : sous-ensembles et organes créés s'ils n'existent pas.
+          for (const l of p.lignes) assurerNoeud(dr, l.machineId, l.sousEnsemble, l.organe, (x) => nouvelId(x));
           for (const l of p.lignes) if (!dr.catalogue.some((a) => a.ref === l.ref)) dr.catalogue.push({ ref: l.ref, designation: l.designation, fournisseur: l.fournisseur, delaiJours: l.delaiJours, criticite: l.criticite });
           for (const rid of synchro) {
             const rev = dr.revisions.find((x) => x.id === rid);

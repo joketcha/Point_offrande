@@ -109,7 +109,7 @@ export function PanneauWorkflow({ a }: { a: AnalyseRevision }) {
   const c = t.controle(a);
   const domaine = t.responsable === 'BMC' ? 'PLANNING' : t.responsable === 'PRODUCTION' ? 'PRODUCTION' : t.responsable === 'ACHATS' ? 'ACHATS' : t.responsable === 'MAGASIN' ? 'RECEPTION' : 'REDEMARRAGE';
   const autorise = user.role === t.responsable || user.role === 'ADMIN';
-  const bmcDerog = user.role === 'BMC' || user.role === 'ADMIN';
+  const bmcDerog = (user.role === 'BMC' || user.role === 'ADMIN') && peut('PLANNING', rev.ligneId);
   const peutAgir = autorise && peut(domaine, rev.ligneId);
   const go = (forcer: boolean) => {
     modifier(

@@ -103,7 +103,7 @@ export function ModalPdr({ a, onClose }: { a: PdrAnalyse; onClose: () => void })
   const { d, user, today, modifier, peut, toast } = useStore();
   const rev = d.revisions.find((r) => r.id === a.pdr.revisionId)!;
   const p = d.pdrs.find((x) => x.id === a.pdr.id) ?? a.pdr;
-  const possibles = actionsPour(p, user.role).filter((x) => user.role === 'ADMIN' || peut(DOMAINE_ROLE[x.role] ?? 'ADMIN', rev.ligneId));
+  const possibles = actionsPour(p, user.role).filter((x) => peut(DOMAINE_ROLE[x.role] ?? 'ADMIN', rev.ligneId));
   const attendues = actionsAttendues(p);
   const [action, setAction] = useState<ActionPdr | null>(null);
   const [valeurs, setValeurs] = useState<Record<string, string>>({});

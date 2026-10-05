@@ -1,8 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { fmt } from './domain/dates';
 import { ROLES } from './domain/referentiel';
+import { empreinte, modeSaisie, peutModifier } from './domain/permissions';
+import type { Utilisateur } from './domain/types';
 import { useStore } from './store/store';
-import { useRoute } from './ui/kit';
+import { Champ, Modal, useRoute } from './ui/kit';
+import Guide from './pages/Guide';
 import Accueil from './pages/Accueil';
 import Planning from './pages/Planning';
 import Gantt from './pages/Gantt';
@@ -32,6 +35,26 @@ export default function App() {
   const route = useRoute();
   const { d, user, setUser, today, mesNotifications, toasts } = useStore();
   const [menu, setMenu] = useState(false);
+  const [connexion, setConnexion] = useState<Utilisateur | null>(null);
+  const [mdp, setMdp] = useState('');
+  const [mdpErreur, setMdpErreur] = useState('');
+  const lectureSeule = !peutModifier(d, user, 'NOTIFICATIONS') && !peutModifier(d, user, 'PLANNING');
+  const changerUtilisateur = (id: string) => {
+    const u = d.utilisateurs.find((x) => x.id === id);
+    if (!u) return;
+    if (u.motDePasseHash) {
+      setConnexion(u);
+      setMdp('');
+      setMdpErreur('');
+    } else setUser(id);
+  };
+  const validerConnexion = async () => {
+    if (!connexion) return;
+    if ((await empreinte(mdp)) === connexion.motDePasseHash) {
+      setUser(connexion.id);
+      setConnexion(null);
+    } else setMdpErreur('Mot de passe incorrect.');
+  };
   const [theme, setTheme] = useState<string>(() => {
     try {
       return localStorage.getItem('pilotage-revisions:theme') || 'auto';
@@ -59,6 +82,7 @@ export default function App() {
       titre: 'Pilotage',
       items: [
         { id: '', label: 'Accueil', ico: '◉' },
+        { id: 'guide', label: 'Mise en route', ico: '🧭' },
         { id: 'notifications', label: 'Mes notifications', ico: '🔔', cnt: ouvertes },
         { id: 'risques', label: 'Risques', ico: '⚠' },
         { id: 'kpi', label: 'KPI', ico: '📊' },
@@ -110,6 +134,9 @@ export default function App() {
   switch (page) {
     case '':
       contenu = <Accueil />;
+      break;
+    case 'guide':
+      contenu = <Guide />;
       break;
     case 'planning':
       contenu = <Planning />;
@@ -203,16 +230,24 @@ export default function App() {
           <div className="grow" />
           <label className="row small" title="Simulation de connexion : chaque rôle ne voit et ne modifie que son domaine">
             <span className="muted">Connecté :</span>
-            <select className="inline" value={user.id} onChange={(e) => setUser(e.target.value)} aria-label="Utilisateur">
+            <select className="inline" value={user.id} onChange={(e) => changerUtilisateur(e.target.value)} aria-label="Utilisateur">
               {d.utilisateurs
-                .filter((u) => u.actif)
+                .filter((u) => u.actif || u.id === user.id)
                 .map((u) => (
                   <option key={u.id} value={u.id}>
                     {u.nom} — {ROLES[u.role].court}
+                    {u.motDePasseHash ? ' 🔒' : ''}
                   </option>
                 ))}
             </select>
           </label>
+          {lectureSeule ? (
+            <span className="badge" title={modeSaisie(d) === 'ADMIN' ? 'Mise en route : seuls les administrateurs saisissent les données.' : 'Votre profil ne donne pas de droit de modification.'}>
+              👁 Lecture seule
+            </span>
+          ) : (
+            <span className="badge ok">✎ Saisie</span>
+          )}
           <select className="inline small" value={theme} onChange={(e) => setTheme(e.target.value)} aria-label="Thème">
             <option value="auto">Thème auto</option>
             <option value="light">Clair</option>
@@ -221,6 +256,27 @@ export default function App() {
         </header>
         <main className="content">{contenu}</main>
       </div>
+      {connexion && (
+        <Modal
+          titre={`Connexion — ${connexion.nom}`}
+          onClose={() => setConnexion(null)}
+          pied={
+            <>
+              <button className="btn" onClick={() => setConnexion(null)}>
+                Annuler
+              </button>
+              <button className="btn primary" onClick={validerConnexion}>
+                Se connecter
+              </button>
+            </>
+          }
+        >
+          <Champ label="Mot de passe" req>
+            <input type="password" autoFocus value={mdp} onChange={(e) => setMdp(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && validerConnexion()} aria-label="Mot de passe" />
+          </Champ>
+          {mdpErreur && <p className="small crit-txt" style={{ marginTop: 8 }}>{mdpErreur}</p>}
+        </Modal>
+      )}
       <div className="toasts">
         {toasts.map((t) => (
           <div key={t.id} className={`toast ${t.type}`}>

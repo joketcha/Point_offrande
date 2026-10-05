@@ -308,7 +308,7 @@ function OngletPlanning({ a }: { a: AnalyseRevision }) {
                 <Champ label="Responsable">
                   <select value={edit.responsableId} onChange={(e) => setEdit({ ...edit, responsableId: e.target.value })}>
                     {d.utilisateurs
-                      .filter((u) => u.role === 'MAINTENANCE')
+                      .filter((u) => (u.actif && u.role !== 'DIRECTION' && u.role !== 'PRESTATAIRE') || u.id === edit.responsableId)
                       .map((u) => (
                         <option key={u.id} value={u.id}>
                           {u.nom}
@@ -465,7 +465,7 @@ function OngletPreparation({ a }: { a: AnalyseRevision }) {
               </thead>
               <tbody>
                 {r.actionsPreparation.map((x) => {
-                  const mien = user.role === x.responsable || user.role === 'ADMIN' || (user.role === 'BMC' && x.responsable === 'BMC');
+                  const mien = user.role === 'ADMIN' || (d.parametres.modeSaisie === 'ROLES' && user.role === x.responsable && user.actif);
                   const retard = !x.faite && x.echeance < today;
                   return (
                     <tr key={x.id}>

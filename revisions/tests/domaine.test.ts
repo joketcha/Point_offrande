@@ -8,6 +8,8 @@ import { analyserTableau, comparerGammes, nouvelleVersion, synchroniserPdr } fro
 import { construireNotifications, concerne } from '../src/domain/notifications';
 import { avancerPdr, dateDispoEstimee, responsablePdr } from '../src/domain/pdr';
 import { ligneVisible, peutModifier } from '../src/domain/permissions';
+import { appliquerReferentiel } from '../src/domain/importReferentiel';
+import { creerBaseVide } from '../src/data/seed';
 import { actionsPreparationAGenerer, appliquerReport, derive } from '../src/domain/planning';
 import { RACI } from '../src/domain/referentiel';
 import { controleTechnicienPdr, noteGlobale } from '../src/domain/techniciens';
@@ -201,13 +203,48 @@ describe('import de gamme (§9)', () => {
 });
 
 describe('permissions (§35)', () => {
+  const u = (id: string) => d.utilisateurs.find((x) => x.id === id)!;
+  it('mise en route : seuls les administrateurs saisissent, les autres lisent', () => {
+    expect(d.parametres.modeSaisie).toBe('ADMIN');
+    expect(peutModifier(d, u('u-admin'), 'ACHATS', 'L02')).toBe(true);
+    for (const id of ['u-bmc', 'u-achats', 'u-maint', 'u-dir']) expect(peutModifier(d, u(id), 'NOTIFICATIONS')).toBe(false);
+    expect(ligneVisible(d, u('u-achats'), 'L02')).toBe(true);
+  });
+  it('mode par profil : la matrice de l\'administrateur s\'applique', () => {
+    const r = { ...d, parametres: { ...d.parametres, modeSaisie: 'ROLES' as const, droits: { ACHATS: ['ACHATS' as const, 'BMC' as const] } } };
+    expect(peutModifier(r, u('u-bmc'), 'ACHATS', 'L02')).toBe(true);
+    expect(peutModifier(r, u('u-achats'), 'TRANSIT', 'L02')).toBe(false);
+  });
   it('chaque métier ne modifie que son domaine et son périmètre', () => {
-    const u = (id: string) => d.utilisateurs.find((x) => x.id === id)!;
-    expect(peutModifier(d, u('u-achats'), 'ACHATS', 'L02')).toBe(true);
-    expect(peutModifier(d, u('u-achats'), 'TRANSIT', 'L02')).toBe(false);
-    expect(peutModifier(d, u('u-maint2'), 'TRAVAUX', 'L02')).toBe(false);
-    expect(peutModifier(d, u('u-maint2'), 'TRAVAUX', 'L03')).toBe(true);
+    const d2 = { ...d, parametres: { ...d.parametres, modeSaisie: 'ROLES' as const } };
+    const peut = (id: string, dom: Parameters<typeof peutModifier>[2], l: string) => peutModifier(d2, u(id), dom, l);
+    expect(peut('u-achats', 'ACHATS', 'L02')).toBe(true);
+    expect(peut('u-achats', 'TRANSIT', 'L02')).toBe(false);
+    expect(peut('u-maint2', 'TRAVAUX', 'L02')).toBe(false);
+    expect(peut('u-maint2', 'TRAVAUX', 'L03')).toBe(true);
     expect(ligneVisible(d, u('u-bmc'), 'L04')).toBe(true);
     expect(ligneVisible(d, u('u-presta'), 'L03')).toBe(false);
+  });
+});
+
+describe('import du référentiel (mise en route)', () => {
+  it('crée la hiérarchie manquante sans rien écraser', () => {
+    const vide = creerBaseVide('2026-10-05');
+    let n = 0;
+    const id = (p: string) => `${p}-${++n}`;
+    const b = appliquerReferentiel(
+      [
+        ['Site', 'Atelier', 'Ligne', 'Nom ligne', 'Machine', 'Nom machine', 'Sous-ensemble', 'Organe'],
+        ['Usine', 'Cond.', 'L01', 'Ligne 1', 'SOU-1', 'Souffleuse', 'Roue', 'Moules'],
+        ['Usine', 'Cond.', 'L01', 'Ligne 1', 'SOU-1', 'Souffleuse', 'Roue', 'Tiges'],
+        ['Usine', 'Cond.', 'L01', 'Ligne 1', 'REM-1', 'Remplisseuse', '', ''],
+      ],
+      vide,
+      id,
+    );
+    expect([b.sites, b.ateliers, b.lignes, b.machines, b.sousEnsembles, b.organes]).toEqual([1, 1, 1, 2, 1, 2]);
+    const b2 = appliquerReferentiel([['Site', 'Atelier', 'Ligne'], ['Usine', 'Cond.', 'L01']], vide, id);
+    expect(b2.lignes).toBe(0);
+    expect(vide.utilisateurs.map((x) => x.role)).toEqual(['ADMIN']);
   });
 });

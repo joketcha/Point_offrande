@@ -27,6 +27,18 @@ Un jeu de démonstration réaliste (usine d'Abidjan, 5 lignes, 7 révisions) est
 | REV-2027-L04 | Approvisionnement — commande critique jamais passée après sa date limite, actions J-7 mois en retard |
 | REV-2027-UT1 / L01 | Planifiées |
 
+## Mise en route : saisie par les administrateurs
+
+Par défaut, l'application est en mode **« Administrateurs seuls »** : seuls les comptes au profil *Administrateur* saisissent ; tous les autres profils sont en **lecture seule** (badge « 👁 Lecture seule »). L'administrateur gère lui-même :
+
+- les **utilisateurs** (création, profil, périmètre site/atelier/ligne, mot de passe, désactivation ; le dernier administrateur ne peut pas être retiré) ;
+- les **profils** : matrice « qui peut modifier quoi », préparée pour le passage ultérieur en mode **« Saisie par profil »** ;
+- le **référentiel** (formulaire ou import Excel Site / Atelier / Ligne / Machine / Sous-ensemble / Organe), les gammes, les révisions et tout le suivi.
+
+Le menu **Mise en route** déroule les étapes avec leur avancement : sécuriser l'accès admin → base vide → référentiel → utilisateurs → gammes → révisions → besoins PDR → techniciens / travaux → sauvegarde. Les lecteurs reçoivent les données à jour par l'export JSON de l'administrateur (« Charger les données à jour »).
+
+> Les mots de passe sont un contrôle d'accès **local** (empreinte SHA-256 dans le navigateur) : ils empêchent une saisie par erreur, pas une personne techniquement déterminée. Une vraie authentification viendra avec le serveur.
+
 ## Modules
 
 Accueil (Critique → Action → Risque, prochaines révisions, PDR critiques, transit, travaux, redémarrages, KPI) · Mes notifications · Risques & matrice de responsabilité · KPI · Planification annuelle · **Gantt intelligent** · Arborescence Site › Atelier › Ligne › Machine › Sous-ensemble › Organe › PDR · Gammes versionnées · Import Excel · Achats · Transit · Réception · Techniciens (+ évaluation) · Travaux (chemin critique) · Redémarrage & stabilisation · REX · Historique / audit · Administration.

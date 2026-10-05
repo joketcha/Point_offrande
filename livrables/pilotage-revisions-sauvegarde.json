@@ -6645,6 +6645,7 @@
     "delaiConfirmationJours": 7,
     "moisPreparation": 7,
     "devise": "FCFA",
+    "modeSaisie": "ADMIN",
     "dateReference": "2026-10-05"
   }
 }

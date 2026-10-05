@@ -48,6 +48,7 @@ export const PARAMETRES_DEFAUT: Parametres = {
   delaiConfirmationJours: 7,
   moisPreparation: 7,
   devise: 'FCFA',
+  modeSaisie: 'ADMIN',
 };
 
 /* ------------------------------------------------------------------ */
@@ -626,3 +627,34 @@ function evaluation(n: number[], commentaire: string, date: ISODate) {
   return { notes: Object.fromEntries(k.map((c, i) => [c, n[i]])) as Record<(typeof k)[number], number>, commentaire, auteur: 'S. Traoré', date };
 }
 
+
+/**
+ * Base vide pour la mise en service réelle : aucun site, aucune révision.
+ * On conserve uniquement les utilisateurs et les paramètres fournis (ou un
+ * administrateur par défaut). Mode de saisie : administrateurs seuls.
+ */
+export function creerBaseVide(T: ISODate, utilisateurs?: Utilisateur[], parametres?: Parametres): Donnees {
+  return {
+    version: 1,
+    sites: [],
+    ateliers: [],
+    lignes: [],
+    machines: [],
+    sousEnsembles: [],
+    organes: [],
+    catalogue: [],
+    utilisateurs: utilisateurs?.length ? utilisateurs : [{ id: 'u-admin', nom: 'Administrateur', role: 'ADMIN', perimetre: { siteIds: [], atelierIds: [], ligneIds: [] }, actif: true }],
+    revisions: [],
+    gammes: [],
+    imports: [],
+    pdrs: [],
+    interventions: [],
+    travaux: [],
+    incidents: [],
+    stabilisation: [],
+    rex: [],
+    notifications: [],
+    audit: [{ id: 'AUD-0', horodatage: `${T}T00:00`, auteur: 'Système', role: 'ADMIN', entite: 'Données', entiteId: '-', action: 'INITIALISATION', detail: 'Création d\'une base vide (mise en service)' }],
+    parametres: { ...PARAMETRES_DEFAUT, ...(parametres ?? {}), dateReference: undefined, modeSaisie: 'ADMIN' },
+  };
+}

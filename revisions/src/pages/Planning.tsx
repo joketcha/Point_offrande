@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { addDays, diffDays, fmtCourt } from '../domain/dates';
-import { STATUTS, WORKFLOW } from '../domain/referentiel';
+import { ROLES, STATUTS, WORKFLOW } from '../domain/referentiel';
 import type { Revision, StatutRevision } from '../domain/types';
 import { nouvelId, useStore } from '../store/store';
 import { Card, Champ, EcartBadge, Modal, NiveauBadge, Prog, StatutBadge, Vide, aller, csv, telecharger } from '../ui/kit';
@@ -219,7 +219,7 @@ function ModalCreation({ onClose }: { onClose: () => void }) {
   const [ligneId, setLigneId] = useState(d.lignes.find((l) => visible(l.id))?.id ?? '');
   const [date, setDate] = useState(addDays(today, 240));
   const [duree, setDuree] = useState(8);
-  const [resp, setResp] = useState(d.utilisateurs.find((u) => u.role === 'MAINTENANCE')?.id ?? '');
+  const [resp, setResp] = useState((d.utilisateurs.find((u) => u.role === 'MAINTENANCE' && u.actif) ?? d.utilisateurs.find((u) => u.actif))?.id ?? '');
   const [redem, setRedem] = useState(24);
   const [stab, setStab] = useState(4);
   const [comment, setComment] = useState('');
@@ -293,10 +293,11 @@ function ModalCreation({ onClose }: { onClose: () => void }) {
         <Champ label="Responsable" req>
           <select value={resp} onChange={(e) => setResp(e.target.value)}>
             {d.utilisateurs
-              .filter((u) => u.role === 'MAINTENANCE')
+              .filter((u) => u.actif && u.role !== 'DIRECTION' && u.role !== 'PRESTATAIRE')
+              .sort((a, b) => Number(b.role === 'MAINTENANCE') - Number(a.role === 'MAINTENANCE'))
               .map((u) => (
                 <option key={u.id} value={u.id}>
-                  {u.nom}
+                  {u.nom} — {ROLES[u.role].court}
                 </option>
               ))}
           </select>
