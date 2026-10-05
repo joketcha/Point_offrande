@@ -1,3 +1,5 @@
+import type { Rca } from './rca';
+
 /**
  * Modèle de données du pilotage des révisions annuelles.
  *
@@ -479,6 +481,8 @@ export interface Donnees {
   incidents: IncidentRedemarrage[];
   stabilisation: StabilisationJour[];
   rex: Rex[];
+  /** Analyses de causes racines (absent dans les anciennes sauvegardes). */
+  rca?: Rca[];
   notifications: EtatNotification[];
   audit: AuditEntry[];
   parametres: Parametres;

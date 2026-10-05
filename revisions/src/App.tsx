@@ -6,6 +6,7 @@ import type { Utilisateur } from './domain/types';
 import { useStore } from './store/store';
 import { Champ, Modal, useRoute } from './ui/kit';
 import Guide from './pages/Guide';
+import RcaPage from './pages/Rca';
 import Accueil from './pages/Accueil';
 import Planning from './pages/Planning';
 import Gantt from './pages/Gantt';
@@ -33,7 +34,7 @@ interface Entree {
 
 export default function App() {
   const route = useRoute();
-  const { d, user, setUser, today, mesNotifications, toasts } = useStore();
+  const { d, user, setUser, today, mesNotifications, toasts, visible } = useStore();
   const [menu, setMenu] = useState(false);
   const [connexion, setConnexion] = useState<Utilisateur | null>(null);
   const [mdp, setMdp] = useState('');
@@ -122,6 +123,7 @@ export default function App() {
     {
       titre: 'Capitalisation',
       items: [
+        { id: 'rca', label: 'RCA — causes racines', ico: '🔍', cnt: (d.rca ?? []).filter((r) => r.statut === 'EN_COURS' && visible(r.ligneId ?? '')).length || undefined },
         { id: 'rex', label: 'REX', ico: '💡' },
         { id: 'audit', label: 'Historique / audit', ico: '🕘' },
         { id: 'admin', label: 'Administration', ico: '⚙' },
@@ -175,6 +177,9 @@ export default function App() {
       break;
     case 'notifications':
       contenu = <Notifications />;
+      break;
+    case 'rca':
+      contenu = <RcaPage id={route[1]} vue={route[2]} />;
       break;
     case 'rex':
       contenu = <RexPage />;

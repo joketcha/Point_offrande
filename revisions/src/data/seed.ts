@@ -1,6 +1,7 @@
 import { addDays, addMonths } from '../domain/dates';
 import { ETAPES_PDR, indexEtape } from '../domain/referentiel';
 import { actionsPreparationAGenerer } from '../domain/planning';
+import { rcaVide, type Rca } from '../domain/rca';
 import type {
   ArticlePDR,
   Atelier,
@@ -589,8 +590,11 @@ export function creerDonneesDemo(T: ISODate): Donnees {
   revisions.at(-1)!.reports.push({ version: 1, ancienneDate: j(250), nouvelleDate: j(260), motif: 'Alignement sur l\'arrêt général électrique', auteur: 'A. Kouassi', date: j(-3) });
   revisions.push(nouvelleRevision({ id: 'R27-L01', code: 'REV-2027-L01', ligneId: 'L01', responsableId: 'u-maint', dateInitiale: j(290), datePrevue: j(290), dureePrevueJours: 9, statut: 'PLANIFIEE' }));
 
+  const rca = [exempleRca(j)];
+
   return {
     version: 1,
+    rca,
     sites,
     ateliers,
     lignes,
@@ -653,8 +657,102 @@ export function creerBaseVide(T: ISODate, utilisateurs?: Utilisateur[], parametr
     incidents: [],
     stabilisation: [],
     rex: [],
+    rca: [],
     notifications: [],
     audit: [{ id: 'AUD-0', horodatage: `${T}T00:00`, auteur: 'Système', role: 'ADMIN', entite: 'Données', entiteId: '-', action: 'INITIALISATION', detail: 'Création d\'une base vide (mise en service)' }],
     parametres: { ...PARAMETRES_DEFAUT, ...(parametres ?? {}), dateReference: undefined, modeSaisie: 'ADMIN' },
+  };
+}
+
+/** RCA de démonstration, clôturée : sonde PT100 mal repositionnée au redémarrage L03 2025. */
+function exempleRca(j: (n: number) => ISODate): Rca {
+  const base = rcaVide('RCA-1', 'RCA-2025-001', 'A. Kouassi', j(-308), {
+    titre: 'Température de pasteurisation instable au redémarrage — PAS-003',
+    revisionId: 'R25-L03',
+    ligneId: 'L03',
+    machineId: 'M-PAS-003',
+    source: { type: 'INCIDENT', id: 'R25-L03-I1' },
+    statut: 'CLOTUREE',
+    etape: 12,
+  });
+  return {
+    ...base,
+    declenchement: { criteres: ['CRITIQUE', 'ARRET_LONG', 'REPETITIVE'], niveau: 'N2', justification: '6 h de redémarrage perdues sur un équipement critique qualité ; même symptôme constaté après la révision 2023.' },
+    probleme: {
+      quoi: 'Unités de pasteurisation (UP) inférieures à 15 sur la zone 3 du pasteurisateur',
+      ou: 'Ligne L03 — PAS-003, zone 3, sonde de régulation TT-303',
+      quand: `${j(-309)} à 09h40, première heure de production après révision`,
+      qui: 'Détecté par le contrôle qualité (prélèvement horaire)',
+      comment: 'Écart de température lu : 58 °C affichés pour 63 °C mesurés au thermomètre de référence',
+      combien: '6 h de redémarrage supplémentaires, 1 800 bouteilles isolées, 1 occurrence',
+      pourquoi: 'Risque sanitaire et retard de remise en production',
+      attendu: 'UP ≥ 15 dès la première production, écart sonde/référence ≤ 0,5 °C',
+      observe: 'UP 9 à 12 pendant 6 h, écart sonde/référence de 5 °C',
+    },
+    confinement: [
+      { id: 'c1', texte: 'Blocage et re-pasteurisation des 1 800 bouteilles produites', date: j(-309), faite: true },
+      { id: 'c2', texte: 'Contrôle UP au thermomètre de référence toutes les 30 min jusqu\'à stabilisation', date: j(-309), faite: true },
+    ],
+    equipe: [
+      { id: 'e1', role: 'Production', nom: 'M. Koné' },
+      { id: 'e2', role: 'Maintenance', nom: 'R. Bamba' },
+      { id: 'e3', role: 'Méthodes (BMC)', nom: 'A. Kouassi' },
+      { id: 'e4', role: 'Qualité', nom: 'Responsable laboratoire' },
+      { id: 'e5', role: 'Fournisseur', nom: 'Alfa Laval Services' },
+    ],
+    preuves: {
+      parts: 'Sonde PT100 TT-303 déposée et conservée ; doigt de gant intact, sans dépôt',
+      position: 'Sonde enfoncée de 15 mm au lieu de 45 mm dans le doigt de gant (photo avant correction)',
+      people: 'Technicien de remontage : repère de profondeur absent ; prestataire parti avant la première production',
+      paper: 'Historique DIMOMAINT : même écart en 2023 (OT 23-1182) ; gamme de remontage sans cote de profondeur ; certificat d\'étalonnage valide',
+      piecesPreservees: true,
+    },
+    chronologie: [
+      { id: 'h1', date: j(-318), heure: '14:00', evenement: 'Dépose des sondes pour rejointage de l\'échangeur (prestataire)' },
+      { id: 'h2', date: j(-311), heure: '16:30', evenement: 'Remontage des sondes par l\'équipe maintenance, prestataire déjà reparti' },
+      { id: 'h3', date: j(-310), heure: '05:00', evenement: 'Autorisation de démarrage — check-list sans contrôle des sondes' },
+      { id: 'h4', date: j(-309), heure: '09:40', evenement: 'Contrôle qualité : UP < 15 en zone 3' },
+      { id: 'h5', date: j(-309), heure: '15:40', evenement: 'Sonde repositionnée et contrôlée : UP conformes' },
+    ],
+    mecanisme: { type: 'DEREGLAGE', description: 'Mauvais montage : mesure de température faussée par une immersion insuffisante (pas de défaillance du capteur)', preuve: 'Écart nul au banc d\'étalonnage ; écart de 5 °C supprimé après repositionnement' },
+    ishikawa: [
+      { id: 'i1', famille: 'MESURE', texte: 'Sonde PT100 dérivée / hors étalonnage', statut: 'ECARTEE', preuve: 'Contrôle au banc : écart 0,1 °C' },
+      { id: 'i2', famille: 'METHODE', texte: 'Profondeur d\'insertion non spécifiée au remontage', statut: 'CONFIRMEE', preuve: 'Gamme de remontage relue : aucune cote' },
+      { id: 'i3', famille: 'MAIN_OEUVRE', texte: 'Remontage sans le prestataire spécialiste', statut: 'CONFIRMEE', preuve: 'Planning prestataire : départ 2 jours avant le redémarrage' },
+      { id: 'i4', famille: 'MATERIEL', texte: 'Encrassement de l\'échangeur zone 3', statut: 'ECARTEE', preuve: 'Plaques neuves, ΔP normale' },
+      { id: 'i5', famille: 'MILIEU', texte: 'Eau d\'appoint trop froide', statut: 'ECARTEE', preuve: 'Température eau d\'appoint normale (relevé)' },
+    ],
+    branches: [
+      {
+        id: 'b1',
+        hypotheseId: 'i2',
+        typeCause: 'LATENTE',
+        racine: true,
+        niveaux: [
+          { texte: 'La température mesurée en zone 3 était fausse', preuve: 'Écart de 5 °C avec la référence', statut: 'CONFIRMEE' },
+          { texte: 'La sonde était insuffisamment enfoncée', preuve: '15 mm au lieu de 45 mm (photo)', statut: 'CONFIRMEE' },
+          { texte: 'Le technicien n\'avait pas de repère de profondeur', preuve: 'Témoignage + absence de repère sur la sonde', statut: 'CONFIRMEE' },
+          { texte: 'La gamme de remontage ne spécifie ni cote ni contrôle des sondes', preuve: 'Gamme GR-PAS-03 rév. B', statut: 'CONFIRMEE' },
+        ],
+      },
+      {
+        id: 'b2',
+        hypotheseId: 'i3',
+        typeCause: 'LATENTE',
+        racine: true,
+        niveaux: [
+          { texte: 'Le remontage a été fait sans le spécialiste', preuve: 'Planning prestataire', statut: 'CONFIRMEE' },
+          { texte: 'Le contrat prestataire s\'arrêtait à la fin des travaux', preuve: 'Bon de commande', statut: 'CONFIRMEE' },
+          { texte: 'La planification des prestataires ne couvre pas le redémarrage', preuve: 'Procédure de préparation révision', statut: 'CONFIRMEE' },
+        ],
+      },
+    ],
+    actions: [
+      { id: 'a1', texte: 'Ajouter une butée mécanique de profondeur sur les doigts de gant des sondes', brancheId: 'b1', hierarchie: 'CONCEPTION', responsable: 'MAINTENANCE', porteur: 'R. Bamba', echeance: j(-240), indicateur: 'Butées posées sur 6/6 sondes', faite: true },
+      { id: 'a2', texte: 'Réviser la gamme GR-PAS-03 : cote d\'insertion + contrôle sonde/référence avant démarrage', brancheId: 'b1', hierarchie: 'PROCEDURE', responsable: 'BMC', porteur: 'A. Kouassi', echeance: j(-270), indicateur: 'Gamme rév. C diffusée', faite: true },
+      { id: 'a3', texte: 'Inclure le prestataire jusqu\'à la première production conforme dans les commandes de révision', brancheId: 'b2', hierarchie: 'PROCEDURE', responsable: 'MAINTENANCE', porteur: 'S. Traoré', echeance: j(-200), indicateur: 'Clause présente dans 100 % des commandes prestataires', faite: true },
+    ],
+    verification: { indicateur: 'Écart sonde/référence zone 3 au redémarrage et UP de la première heure', critere: 'Absence de récidive sur 3 redémarrages (3 × MTBF)', mtbfJours: 90, dateControle: j(-30), resultat: 'EFFICACE', commentaire: 'Aucun écart lors des 3 redémarrages suivants.' },
+    capitalisation: { planMaintenance: 'Contrôle annuel des sondes de régulation ajouté au plan PAS-003', amdec: 'AMDEC pasteurisateur : mode « mesure faussée par montage » ajouté, G=8 O=3 D=2', codesDimomaint: 'Code défaillance MES-MONT (mesure / montage) créé', rex: true },
   };
 }

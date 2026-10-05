@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 /** Parcours de fumée : chaque module s'affiche sans erreur JavaScript. */
 
-const PAGES = ['', 'guide', 'notifications', 'risques', 'kpi', 'planning', 'gantt', 'arborescence', 'gammes', 'import', 'achats', 'transit', 'reception', 'techniciens', 'travaux', 'redemarrage', 'rex', 'audit', 'admin'];
+const PAGES = ['', 'guide', 'rca', 'rca/RCA-1', 'rca/RCA-1/a3', 'notifications', 'risques', 'kpi', 'planning', 'gantt', 'arborescence', 'gammes', 'import', 'achats', 'transit', 'reception', 'techniciens', 'travaux', 'redemarrage', 'rex', 'audit', 'admin'];
 const ONGLETS = ['synthese', 'planning', 'preparation', 'pdr', 'techniciens', 'travaux', 'redemarrage', 'stabilisation', 'risques', 'rex', 'historique'];
 
 async function enAdmin(page: Page) {
@@ -147,5 +147,28 @@ test('administrateur : mot de passe, base vide, référentiel, révision', async
   await expect(page.getByText('✎ Saisie')).toBeVisible();
   await page.goto('/#/guide');
   await expect(page.getByRole('heading', { name: /Mise en route/ })).toBeVisible();
+  expect(erreurs).toEqual([]);
+});
+
+test('RCA : lancement depuis un incident, contrôle de l\'énoncé, fiche A3', async ({ page }) => {
+  const erreurs = surveiller(page);
+  await enAdmin(page);
+  await page.goto('/#/revision/R25-L03/redemarrage');
+  await expect(page.getByRole('link', { name: /RCA-2025-001/ })).toBeVisible();
+  // Nouvel incident puis RCA
+  await page.goto('/#/revision/R26-L02/redemarrage');
+  await page.getByRole('button', { name: '+ Déclarer un incident' }).click();
+  await page.getByLabel('Problème').fill('Bourrage étoile de transfert');
+  await page.getByRole('button', { name: 'Enregistrer', exact: true }).click();
+  await page.getByRole('button', { name: '🔍 RCA' }).click();
+  await expect(page.getByText('Pourquoi cette étape compte')).toBeVisible();
+  await page.getByRole('button', { name: /Étape suivante/ }).click();
+  await page.getByLabel('Quoi ? (le phénomène)').fill('Bourrage à cause du technicien');
+  await expect(page.getByText(/contient une cause ou un jugement/)).toBeVisible();
+  await page.getByRole('button', { name: 'Enregistrer' }).first().click();
+  await page.getByRole('button', { name: /Ishikawa 6M/ }).click();
+  await expect(page.getByText('Effet')).toBeVisible();
+  await page.getByRole('button', { name: 'Fiche A3' }).click();
+  await expect(page.getByText('Retour d\'expérience sur l\'analyse')).toBeVisible();
   expect(erreurs).toEqual([]);
 });

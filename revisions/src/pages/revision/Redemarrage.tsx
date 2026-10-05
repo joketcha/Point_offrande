@@ -7,6 +7,7 @@ import { JALONS, ROLES } from '../../domain/referentiel';
 import type { IncidentRedemarrage, JalonRedemarrage, StabilisationJour } from '../../domain/types';
 import { nouvelId, useStore } from '../../store/store';
 import { Card, Champ, EcartBadge, Modal, RoleBadge, Vide } from '../../ui/kit';
+import { BoutonRca, rcaDepuisIncident } from '../Rca';
 
 export function OngletRedemarrage({ a }: { a: AnalyseRevision }) {
   const { peut, modifier, toast, today } = useStore();
@@ -141,7 +142,17 @@ export function OngletRedemarrage({ a }: { a: AnalyseRevision }) {
                     <td>
                       <span className={`badge ${i.impact === 'FORT' ? 'crit' : i.impact === 'MOYEN' ? 'act' : 'vig'}`}>{i.impact}</span>
                     </td>
-                    <td>
+                    <td className="nowrap">
+                      {(() => {
+                        const rca = (d.rca ?? []).find((x) => x.source.id === i.id);
+                        return rca ? (
+                          <a className="btn sm" href={`#/rca/${rca.id}`}>
+                            🔍 {rca.code}
+                          </a>
+                        ) : (
+                          <BoutonRca creer={(dd, an, t) => rcaDepuisIncident(dd, i, an, t)} />
+                        );
+                      })()}{' '}
                       {peut('REDEMARRAGE', r.ligneId) && (
                         <button className="btn sm ghost" onClick={() => setInc(i)}>
                           ✎

@@ -7,6 +7,7 @@ import { STATUTS_TRAVAIL } from '../../domain/referentiel';
 import type { Criticite, Priorite, StatutTravail, Travail } from '../../domain/types';
 import { nouvelId, useStore } from '../../store/store';
 import { Card, Champ, EcartBadge, Lien, Modal, Vide } from '../../ui/kit';
+import { BoutonRca, rcaDepuisTravail } from '../Rca';
 
 export function OngletTravaux({ a }: { a: AnalyseRevision }) {
   const { peut, today } = useStore();
@@ -209,6 +210,7 @@ function LigneTravail({ t, a, total, origine, editable, onEdit, today }: { t: Tr
             Débloquer
           </button>
         )}{' '}
+        {(w.statut === 'BLOQUE' || (t.enRetard && t.critique)) && !(d.rca ?? []).some((x) => x.source.id === w.id) && <BoutonRca creer={(dd, an, td) => rcaDepuisTravail(dd, w, an, td)} />}
         {editable && peut('TECHNICIENS', a.revision.ligneId) && (
           <button className="btn sm ghost" onClick={onEdit} aria-label="Modifier">
             ✎

@@ -18,6 +18,7 @@ export type Domaine =
   | 'PRODUCTION'
   | 'STABILISATION'
   | 'REX'
+  | 'RCA'
   | 'NOTIFICATIONS'
   | 'ADMIN';
 
@@ -34,6 +35,7 @@ export const DOMAINES: Record<Domaine, { libelle: string; editeurs: Role[] }> = 
   PRODUCTION: { libelle: 'Démarrage, première production (conforme)', editeurs: ['PRODUCTION'] },
   STABILISATION: { libelle: 'Relevés de stabilisation', editeurs: ['MAINTENANCE', 'PRODUCTION'] },
   REX: { libelle: 'Retour d\'expérience', editeurs: ['MAINTENANCE', 'BMC'] },
+  RCA: { libelle: 'Analyses de causes racines (RCA)', editeurs: ['MAINTENANCE', 'BMC'] },
   NOTIFICATIONS: { libelle: 'Traitement de ses notifications', editeurs: ['BMC', 'MAINTENANCE', 'PRODUCTION', 'ACHATS', 'MAGASIN', 'TRANSIT', 'TECHNICIEN', 'DIRECTION'] },
   ADMIN: { libelle: 'Administration, référentiels, utilisateurs', editeurs: [] },
 };
