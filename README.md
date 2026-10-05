@@ -1,5 +1,7 @@
 # RELIABILITY MASTER — AFRICA TO WORLD
 
+> Ce dépôt contient aussi l'application **[Pilotage des révisions annuelles](revisions/README.md)** (dossier `revisions/`).
+
 **« Deviens celui qui transforme les pannes en performance. »**
 
 Simulateur immersif (« flight simulator ») de l'ingénieur fiabiliste. Le joueur prend son poste à la **Brasserie AIG de Douala** (Africa Industrial Group) — une usine en difficulté — et progresse de *Technicien analyste* à *Global Reliability & Asset Management Expert* en prenant de vraies décisions de fiabilité dont il subit les conséquences.
