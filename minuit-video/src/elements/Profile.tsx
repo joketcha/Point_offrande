@@ -81,6 +81,18 @@ export const Profile: React.FC<ProfileProps> = ({
           <stop offset="0.45" stopColor={lightColor} stopOpacity={0.35} />
           <stop offset="1" stopColor={lightColor} stopOpacity={0} />
         </linearGradient>
+        <clipPath id={`${id}-clip`}>
+          <path d={VISAGE} />
+        </clipPath>
+        <clipPath id={`${id}-clipv`}>
+          <path d={homme ? COIFFE : VOILE} />
+        </clipPath>
+        <filter id={`${id}-peau`} x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency={0.9} numOctaves={2} seed={4} result="n" />
+          <feColorMatrix in="n" type="saturate" values="0" result="g" />
+          <feComposite in="g" in2="SourceAlpha" operator="in" result="t" />
+          <feBlend in="SourceGraphic" in2="t" mode="soft-light" />
+        </filter>
         <linearGradient id={`${id}-lune`} gradientUnits="userSpaceOnUse" x1={-380} y1={-300} x2={-120} y2={0}>
           <stop offset="0" stopColor="#7f98d0" stopOpacity={0.45} />
           <stop offset="1" stopColor="#7f98d0" stopOpacity={0} />
@@ -101,14 +113,37 @@ export const Profile: React.FC<ProfileProps> = ({
       </g>
       <g transform={`translate(${x} ${y + respire}) scale(${scale * facing} ${scale}) rotate(${tilt})`}>
         <path d={VISAGE} fill="#0f0a08" />
-        <path d={VISAGE} fill={`url(#${id}-lum)`} opacity={L} />
-        {homme ? <path d={BARBE} fill="#0b0705" /> : null}
+        <path d={VISAGE} fill={`url(#${id}-lum)`} opacity={L} filter={`url(#${id}-peau)`} />
+        <g clipPath={`url(#${id}-clip)`}>
+          {/* Modelé : orbite, pommette, arête du nez, ombre sous la mâchoire */}
+          <ellipse cx={105} cy={-92} rx={50} ry={32} fill="#000" opacity={0.4} filter="url(#flou-14)" />
+          <ellipse cx={150} cy={-25} rx={42} ry={30} fill={lightColor} opacity={0.32 * L} filter="url(#flou-14)" />
+          <ellipse cx={198} cy={-12} rx={10} ry={26} fill="#fff0d8" opacity={0.28 * L} filter="url(#flou-6)" />
+          <ellipse cx={120} cy={-150} rx={45} ry={18} fill="#fff0d8" opacity={0.12 * L} filter="url(#flou-14)" />
+          <ellipse cx={80} cy={250} rx={140} ry={60} fill="#000" opacity={0.55} filter="url(#flou-14)" />
+          <ellipse cx={-40} cy={0} rx={160} ry={320} fill="#000" opacity={0.45} filter="url(#flou-30)" />
+          <ellipse cx={180} cy={36} rx={9} ry={5} fill="#000" opacity={0.6} filter="url(#flou-2)" />
+          <path d="M 186 70 C 180 62 176 64 170 72" stroke="#3a120c" strokeWidth={5} fill="none" opacity={0.7} />
+          <path d="M 184 58 C 190 64 190 72 184 78 C 186 88 184 96 178 102" stroke="#7a3428" strokeWidth={6} fill="none" opacity={0.55} />
+        </g>
+        {homme ? (
+          <g>
+            <path d={BARBE} fill="#2a1c14" filter="url(#flou-2)" />
+            <path d={BARBE} fill={`url(#${id}-lum)`} opacity={L * 0.45} />
+            <path d="M 184 46 C 178 56 166 60 150 58 C 160 50 172 44 184 46 Z" fill="#2a1c14" />
+            <g stroke="#0d0806" strokeWidth={2.5} opacity={0.6} fill="none">
+              {[0, 1, 2, 3, 4, 5].map((k) => (
+                <path key={k} d={`M ${160 - k * 28} ${130 + k * 6} q ${-6} 40 ${-14} ${70 - k * 4}`} />
+              ))}
+            </g>
+          </g>
+        ) : null}
         {/* Œil */}
         <g transform={`translate(122 ${-94 - gaze * 4})`}>
           <ellipse rx={20} ry={10 * ouv} fill="#e8d8c0" opacity={0.15 + 0.45 * L} />
           <circle cx={9 + gaze} cy={-gaze * 2} r={7.5 * Math.min(1, ouv)} fill="#0a0604" />
           <circle cx={12} cy={-3} r={2.4 * Math.min(1, ouv)} fill="#fff1d0" opacity={0.25 + 0.75 * L} />
-          <path d={`M -22 0 Q 0 ${-14 * ouv - 3} 22 2`} stroke="#0a0604" strokeWidth={4} fill="none" />
+          <path d={`M -22 0 Q 0 ${-14 * ouv - 3} 22 2`} stroke="#0a0604" strokeWidth={5.5} fill="none" />
         </g>
         <path
           d={`M 92 ${-128 - brow * 16} Q 125 ${-142 - brow * 22} 158 ${-130 - brow * 14}`}
@@ -117,10 +152,39 @@ export const Profile: React.FC<ProfileProps> = ({
           strokeLinecap="round"
           fill="none"
         />
+        {!homme ? (
+          <g stroke="#0d0806" fill="none" strokeLinecap="round">
+            <path d="M 150 -250 C 110 -230 80 -200 40 -150" strokeWidth={22} />
+            <path d="M 140 -255 C 100 -240 60 -215 20 -180" strokeWidth={14} opacity={0.8} />
+          </g>
+        ) : null}
         <path d={homme ? COIFFE : VOILE} fill={homme ? "#4a4036" : voile} />
         <path d={homme ? COIFFE : VOILE} fill="#03050a" opacity={0.74} />
         <path d={homme ? COIFFE : VOILE} fill={`url(#${id}-lum)`} opacity={L * 0.7} />
         <path d={homme ? COIFFE : VOILE} fill={`url(#${id}-lune)`} />
+        <g clipPath={`url(#${id}-clipv)`} fill="none">
+          {/* Plis du voile */}
+          {[0, 1, 2, 3].map((k) => (
+            <path
+              key={k}
+              d={`M ${120 - k * 70} -330 C ${40 - k * 80} -150 ${10 - k * 60} 150 ${-40 - k * 70} 720`}
+              stroke="#000"
+              strokeWidth={26}
+              opacity={0.3}
+              filter="url(#flou-14)"
+            />
+          ))}
+          {[0, 1].map((k) => (
+            <path
+              key={`h${k}`}
+              d={`M ${90 - k * 90} -340 C ${10 - k * 90} -160 ${-20 - k * 70} 160 ${-70 - k * 80} 720`}
+              stroke="#fff"
+              strokeWidth={10}
+              opacity={0.07 + 0.06 * L}
+              filter="url(#flou-6)"
+            />
+          ))}
+        </g>
       </g>
     </Stage>
   );

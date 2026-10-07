@@ -22,7 +22,7 @@ const Hauteur: React.FC<{ readonly t0: number; readonly cri: boolean }> = ({ t0,
   return (
     <AbsoluteFill
       style={{
-        transformOrigin: "30% 55%",
+        transformOrigin: cri ? "30% 44%" : "30% 55%",
         scale: cri
           ? interpolate(frame, [0, 4 * fps], [1.9, 2.05], clamp)
           : interpolate(frame, [0, 6 * fps], [1, 1.15], { ...clamp, easing: lent }),
