@@ -26,27 +26,57 @@ export const Subtitle: React.FC<{
   );
   return (
     <AbsoluteFill style={{ justifyContent: "flex-end", alignItems: "center", paddingBottom: bas, paddingLeft: 60, paddingRight: 60, opacity }}>
-      <div
-        style={{
-          fontFamily: cormorant,
-          fontStyle: "italic",
-          fontSize: taille,
-          color: "#f4e7c9",
-          textAlign: "center",
-          maxWidth: 1500,
-          textShadow: "0 2px 18px rgba(0,0,0,0.9)",
-        }}
-      >
-        {children}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: taille * 0.25 }}>
+        <div style={{ width: interpolate(frame, [from, from + 20], [0, taille * 2.2], clamp), height: 1.5, background: "linear-gradient(90deg, rgba(212,175,95,0), #d4af5f, rgba(212,175,95,0))" }} />
+        <div
+          style={{
+            fontFamily: cormorant,
+            fontStyle: "italic",
+            fontSize: taille,
+            letterSpacing: 0.5,
+            textAlign: "center",
+            maxWidth: 1500,
+            ...OR,
+            filter: "drop-shadow(0 2px 14px rgba(0,0,0,0.95))",
+          }}
+        >
+          {children}
+        </div>
       </div>
     </AbsoluteFill>
   );
 };
 
-export const TitreFinal: React.FC<{ readonly children: string; readonly opacity: number; readonly taille?: number }> = ({ children, opacity, taille = 110 }) => (
-  <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", opacity }}>
-    <div style={{ fontFamily: cinzel, fontSize: taille, letterSpacing: taille * 0.16, color: "#f1dcae", textShadow: "0 0 40px rgba(255,170,80,0.35)" }}>
-      {children}
-    </div>
-  </AbsoluteFill>
+// Dégradé or brossé appliqué au texte.
+export const OR: React.CSSProperties = {
+  backgroundImage: "linear-gradient(180deg, #fff3d0 0%, #e9cf8f 38%, #b88a3a 62%, #f1dca2 100%)",
+  WebkitBackgroundClip: "text",
+  backgroundClip: "text",
+  color: "transparent",
+};
+
+export const POLICES = { cormorant, cinzel };
+
+export const TitreFinal: React.FC<{ readonly children: string; readonly opacity: number; readonly taille?: number }> = ({ children, opacity, taille = 110 }) => {
+  const frame = useCurrentFrame();
+  return (
+    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", opacity }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: taille * 0.3 }}>
+        <div style={{ fontFamily: cinzel, fontSize: taille, letterSpacing: taille * 0.16, paddingLeft: taille * 0.16, ...OR, filter: "drop-shadow(0 0 30px rgba(255,180,90,0.35))" }}>
+          {children}
+        </div>
+        <Filet largeur={taille * 4} frame={frame} />
+        <div style={{ fontFamily: cormorant, fontStyle: "italic", fontSize: taille * 0.36, letterSpacing: 2, ...OR }}>Matthieu 25 : 13</div>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// Filet doré avec losange central.
+export const Filet: React.FC<{ readonly largeur: number; readonly frame: number }> = ({ largeur }) => (
+  <div style={{ display: "flex", alignItems: "center", gap: 14, width: largeur }}>
+    <div style={{ flex: 1, height: 1.5, background: "linear-gradient(90deg, rgba(212,175,95,0), #d4af5f)" }} />
+    <div style={{ width: 9, height: 9, rotate: "45deg", background: "#e9cf8f", boxShadow: "0 0 12px rgba(255,200,120,0.8)" }} />
+    <div style={{ flex: 1, height: 1.5, background: "linear-gradient(90deg, #d4af5f, rgba(212,175,95,0))" }} />
+  </div>
 );

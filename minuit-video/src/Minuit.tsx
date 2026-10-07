@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, Sequence, Series, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { Audio } from "@remotion/media";
 import { Cinema } from "./elements/Cinema";
+import { Etalonnage, FuitesDeLumiere, Poussieres, TitreOuverture } from "./elements/Luxe";
 import { PlanIA } from "./elements/PlanIA";
 import { Subtitle, TitreFinal } from "./elements/Text";
 import { ImageCleVue, FONDU, trouverImage } from "./elements/ImageCle";
@@ -134,15 +135,20 @@ export const Minuit: React.FC<MinuitProps> = ({ musique }) => {
   const { fps } = useVideoConfig();
   return (
     <AbsoluteFill style={{ backgroundColor: "#000" }}>
-      <FilmDessine />
-      <CoucheImagesCles ajustement="contain" />
+      <Etalonnage>
+        <FilmDessine />
+        <CoucheImagesCles ajustement="contain" />
 
-      {/* Plans IA détaillés (46 plans) : public/plans/<id>.* */}
-      {DECOUPAGE.map((p) => (
-        <Sequence key={p.id} name={`Plan IA ${p.id}`} from={Math.round(p.debut * fps)} durationInFrames={Math.round(p.duree * fps)} premountFor={fps}>
-          <PlanIA id={p.id} duree={p.duree} />
-        </Sequence>
-      ))}
+        {/* Plans IA détaillés (46 plans) : public/plans/<id>.* */}
+        {DECOUPAGE.map((p) => (
+          <Sequence key={p.id} name={`Plan IA ${p.id}`} from={Math.round(p.debut * fps)} durationInFrames={Math.round(p.duree * fps)} premountFor={fps}>
+            <PlanIA id={p.id} duree={p.duree} />
+          </Sequence>
+        ))}
+      </Etalonnage>
+      <FuitesDeLumiere />
+      <Poussieres />
+      <TitreOuverture />
 
       <Dialogues bas={175} taille={58} />
       <Final taille={110} />

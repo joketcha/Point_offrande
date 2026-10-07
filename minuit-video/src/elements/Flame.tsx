@@ -45,6 +45,13 @@ export const Flame: React.FC<FlameProps> = ({
           opacity={0.6 * vacille + 0.1}
         />
       ) : null}
+      {halo && intensity > 0.05 ? (
+        // Reflet anamorphique horizontal (objectif cinéma)
+        <g opacity={(0.35 + 0.25 * n1) * intensity}>
+          <ellipse cx={0} cy={-h * 0.35} rx={size * (torch ? 22 : 16)} ry={size * 0.22} fill="#ffcf8f" filter="url(#flou-2)" />
+          <ellipse cx={0} cy={-h * 0.35} rx={size * (torch ? 9 : 7)} ry={size * 0.08} fill="#fff4dc" />
+        </g>
+      ) : null}
       {intensity > 0.02 ? (
         <g opacity={Math.min(1, intensity * 1.8)}>
           <path d={flamme(1)} fill="#ff7a1f" opacity={0.85} filter="url(#flou-2)" />
