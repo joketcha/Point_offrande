@@ -119,13 +119,14 @@ export const Final: React.FC<{ readonly taille: number }> = ({ taille }) => {
   );
 };
 
+// La musique (2:58,7) couvre tout le film ; léger fondu de sortie sur la carte finale.
 export const Musique: React.FC<{ readonly musique: string }> = ({ musique }) => {
   const { fps } = useVideoConfig();
   if (!musique) return null;
   return (
     <Audio
       src={staticFile(musique)}
-      volume={(f) => interpolate(f, [0, 2 * fps, 175 * fps, 179 * fps], [0, 1, 1, 0], clamp)}
+      volume={(f) => interpolate(f, [0, 0.5 * fps, 177.4 * fps, 178.7 * fps], [0, 1, 1, 0], clamp)}
     />
   );
 };

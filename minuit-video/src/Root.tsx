@@ -23,7 +23,7 @@ export const RemotionRoot: React.FC = () => {
         width={1920}
         height={1080}
         defaultProps={{
-          musique: "",
+          musique: "musique/au-milieu-de-la-nuit.m4a",
         }}
       />
       <Composition
@@ -34,7 +34,7 @@ export const RemotionRoot: React.FC = () => {
         width={1080}
         height={1920}
         defaultProps={{
-          musique: "",
+          musique: "musique/au-milieu-de-la-nuit.m4a",
         }}
       />
       <Folder name="Scenes">
