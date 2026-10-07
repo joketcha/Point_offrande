@@ -2,9 +2,9 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 
 // Bandes cinéma 2.39:1, vignettage et grain de pellicule.
-export const Cinema: React.FC = () => {
+export const Cinema: React.FC<{ readonly bandes?: boolean }> = ({ bandes = true }) => {
   const frame = useCurrentFrame();
-  const barre = Math.round((1080 - 1920 / 2.39) / 2);
+  const barre = bandes ? Math.round((1080 - 1920 / 2.39) / 2) : 0;
   return (
     <AbsoluteFill style={{ pointerEvents: "none" }}>
       <AbsoluteFill

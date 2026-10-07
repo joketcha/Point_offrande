@@ -1,5 +1,6 @@
 import { Composition, Folder } from "remotion";
 import { Minuit } from "./Minuit";
+import { Reel } from "./Reel";
 import { S01Attente } from "./scenes/S01Attente";
 import { S02Sommeil } from "./scenes/S02Sommeil";
 import { S03Cri } from "./scenes/S03Cri";
@@ -21,6 +22,17 @@ export const RemotionRoot: React.FC = () => {
         fps={30}
         width={1920}
         height={1080}
+        defaultProps={{
+          musique: "",
+        }}
+      />
+      <Composition
+        id="AuMilieuDeLaNuit-Reel"
+        component={Reel}
+        durationInFrames={179 * 30}
+        fps={30}
+        width={1080}
+        height={1920}
         defaultProps={{
           musique: "",
         }}

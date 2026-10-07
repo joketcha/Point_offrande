@@ -33,7 +33,16 @@ Règles du scénario garanties par le code (`src/lib/vierges.ts`, `src/elements/
 exactement **dix** vierges (5 sages, 5 folles), aucune maison pendant l'attente, l'époux
 n'apparaît qu'avec sa procession.
 
-## Plans IA réalistes
+## Rendu réaliste en 20 images (recommandé)
+
+Générez **20 images fixes** avec une IA (prompts dans [IMAGES.md](IMAGES.md)) et déposez-les dans
+`public/images/01.jpg` … `20.jpg`. Le montage ajoute mouvements lents, fondus enchaînés en
+surimpression, sous-titres et grain.
+
+- Vertical 9:16 (Reels, TikTok) : `npx remotion render AuMilieuDeLaNuit-Reel out/reel.mp4`
+- Horizontal 16:9 : `npx remotion render AuMilieuDeLaNuit out/minuit.mp4`
+
+## Plans IA détaillés (46 plans, optionnel)
 
 Le film est découpé en **46 plans** (`src/lib/decoupage.ts`). Pour chaque plan, déposez une
 vidéo ou une image générée par IA dans `public/plans/` sous le nom de son identifiant

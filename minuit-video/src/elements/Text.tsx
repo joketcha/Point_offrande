@@ -15,19 +15,22 @@ export const Subtitle: React.FC<{
   readonly children: string;
   readonly from: number;
   readonly to: number;
-}> = ({ children, from, to }) => {
+  /** marge basse en pixels (plus haute en vertical, au-dessus de l'interface du reel) */
+  readonly bas?: number;
+  readonly taille?: number;
+}> = ({ children, from, to, bas = 175, taille = 58 }) => {
   const frame = useCurrentFrame();
   const opacity = Math.min(
     interpolate(frame, [from, from + 8], [0, 1], clamp),
     interpolate(frame, [to - 8, to], [1, 0], clamp),
   );
   return (
-    <AbsoluteFill style={{ justifyContent: "flex-end", alignItems: "center", paddingBottom: 175, opacity }}>
+    <AbsoluteFill style={{ justifyContent: "flex-end", alignItems: "center", paddingBottom: bas, paddingLeft: 60, paddingRight: 60, opacity }}>
       <div
         style={{
           fontFamily: cormorant,
           fontStyle: "italic",
-          fontSize: 58,
+          fontSize: taille,
           color: "#f4e7c9",
           textAlign: "center",
           maxWidth: 1500,
@@ -40,9 +43,9 @@ export const Subtitle: React.FC<{
   );
 };
 
-export const TitreFinal: React.FC<{ readonly children: string; readonly opacity: number }> = ({ children, opacity }) => (
+export const TitreFinal: React.FC<{ readonly children: string; readonly opacity: number; readonly taille?: number }> = ({ children, opacity, taille = 110 }) => (
   <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", opacity }}>
-    <div style={{ fontFamily: cinzel, fontSize: 110, letterSpacing: 18, color: "#f1dcae", textShadow: "0 0 40px rgba(255,170,80,0.35)" }}>
+    <div style={{ fontFamily: cinzel, fontSize: taille, letterSpacing: taille * 0.16, color: "#f1dcae", textShadow: "0 0 40px rgba(255,170,80,0.35)" }}>
       {children}
     </div>
   </AbsoluteFill>
