@@ -10,6 +10,7 @@
     "@remotion/fonts": "^4.0.534",
     "@remotion/media": "^4.0.534",
     "@remotion/noise": "^4.0.534",
+    "@remotion/studio": "^4.0.534",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "remotion": "4.0.534"

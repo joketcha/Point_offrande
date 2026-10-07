@@ -31,12 +31,12 @@ const Entree: React.FC = () => {
   );
 };
 
-export const S08Porte: React.FC<{ readonly footage?: string }> = ({ footage }) => {
+export const S08Porte: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const choc = frame > 13.4 * fps && frame < 13.9 * fps ? bruit("choc", frame, 1.2) * 6 : 0;
   return (
-    <Plan footage={footage}>
+    <Plan>
       <Series>
         <Series.Sequence name="Les sages entrent avec lui" durationInFrames={6 * fps} premountFor={fps}>
           <Entree />

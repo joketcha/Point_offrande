@@ -3,7 +3,6 @@ import { AbsoluteFill, Series, interpolate, useCurrentFrame, useVideoConfig } fr
 import { Door } from "../elements/Door";
 import { Profile } from "../elements/Profile";
 import { Virgin } from "../elements/Virgin";
-import { Subtitle } from "../elements/Text";
 import { Plan } from "../elements/Plan";
 import { FOLLES } from "../lib/vierges";
 import { clamp, tween } from "../lib/util";
@@ -44,11 +43,11 @@ export const DevantLaPorte: React.FC<{ readonly arrivee?: number; readonly frapp
   );
 };
 
-export const S09TropTard: React.FC<{ readonly footage?: string }> = ({ footage }) => {
+export const S09TropTard: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   return (
-    <Plan footage={footage}>
+    <Plan>
       <Series>
         <Series.Sequence name="Elles arrivent en courant" durationInFrames={4 * fps} premountFor={fps}>
           <Door closed={1} front={<DevantLaPorte arrivee={tween(frame, [0, 3 * fps], [0, 1])} />} />
@@ -57,7 +56,6 @@ export const S09TropTard: React.FC<{ readonly footage?: string }> = ({ footage }
           <AbsoluteFill style={{ scale: interpolate(frame, [4 * fps, 7 * fps], [1.05, 1.15], clamp) }}>
             <Door closed={1} front={<DevantLaPorte frappe={1} />} />
           </AbsoluteFill>
-          <Subtitle from={8} to={3 * fps}>« Seigneur, Seigneur, ouvre-nous ! »</Subtitle>
         </Series.Sequence>
         <Series.Sequence name="Choc, peur et regret" durationInFrames={1.6 * fps} premountFor={fps}>
           <Profile seed="regret" voile={FOLLES[2].voile} lightColor="#7f98d0" light={0.45} eyeOpen={1.15} brow={1} tilt={5} bokeh={0.25} bokehColor="#ffb060" />

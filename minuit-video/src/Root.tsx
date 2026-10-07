@@ -23,31 +23,19 @@ export const RemotionRoot: React.FC = () => {
         height={1080}
         defaultProps={{
           musique: "",
-          plans: {
-            attente: "",
-            sommeil: "",
-            cri: "",
-            reveil: "",
-            huile: "",
-            extinction: "",
-            epoux: "",
-            porte: "",
-            tropTard: "",
-            dernierPlan: "",
-          },
         }}
       />
       <Folder name="Scenes">
-        <Composition id="S01-Attente" component={S01Attente} durationInFrames={15 * 30} fps={30} width={1920} height={1080} defaultProps={{ footage: "" }} />
-        <Composition id="S02-Sommeil" component={S02Sommeil} durationInFrames={20 * 30} fps={30} width={1920} height={1080} defaultProps={{ footage: "" }} />
-        <Composition id="S03-Cri" component={S03Cri} durationInFrames={20 * 30} fps={30} width={1920} height={1080} defaultProps={{ footage: "" }} />
-        <Composition id="S04-Reveil" component={S04Reveil} durationInFrames={25 * 30} fps={30} width={1920} height={1080} defaultProps={{ footage: "" }} />
-        <Composition id="S05-HuileManque" component={S05HuileManque} durationInFrames={25 * 30} fps={30} width={1920} height={1080} defaultProps={{ footage: "" }} />
-        <Composition id="S06-Extinction" component={S06Extinction} durationInFrames={25 * 30} fps={30} width={1920} height={1080} defaultProps={{ footage: "" }} />
-        <Composition id="S07-Epoux" component={S07Epoux} durationInFrames={20 * 30} fps={30} width={1920} height={1080} defaultProps={{ footage: "" }} />
-        <Composition id="S08-Porte" component={S08Porte} durationInFrames={15 * 30} fps={30} width={1920} height={1080} defaultProps={{ footage: "" }} />
-        <Composition id="S09-TropTard" component={S09TropTard} durationInFrames={10 * 30} fps={30} width={1920} height={1080} defaultProps={{ footage: "" }} />
-        <Composition id="S10-DernierPlan" component={S10DernierPlan} durationInFrames={4 * 30} fps={30} width={1920} height={1080} defaultProps={{ footage: "" }} />
+        <Composition id="S01-Attente" component={S01Attente} durationInFrames={15 * 30} fps={30} width={1920} height={1080} />
+        <Composition id="S02-Sommeil" component={S02Sommeil} durationInFrames={20 * 30} fps={30} width={1920} height={1080} />
+        <Composition id="S03-Cri" component={S03Cri} durationInFrames={20 * 30} fps={30} width={1920} height={1080} />
+        <Composition id="S04-Reveil" component={S04Reveil} durationInFrames={25 * 30} fps={30} width={1920} height={1080} />
+        <Composition id="S05-HuileManque" component={S05HuileManque} durationInFrames={25 * 30} fps={30} width={1920} height={1080} />
+        <Composition id="S06-Extinction" component={S06Extinction} durationInFrames={25 * 30} fps={30} width={1920} height={1080} />
+        <Composition id="S07-Epoux" component={S07Epoux} durationInFrames={20 * 30} fps={30} width={1920} height={1080} />
+        <Composition id="S08-Porte" component={S08Porte} durationInFrames={15 * 30} fps={30} width={1920} height={1080} />
+        <Composition id="S09-TropTard" component={S09TropTard} durationInFrames={10 * 30} fps={30} width={1920} height={1080} />
+        <Composition id="S10-DernierPlan" component={S10DernierPlan} durationInFrames={4 * 30} fps={30} width={1920} height={1080} />
       </Folder>
     </>
   );

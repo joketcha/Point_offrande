@@ -33,12 +33,17 @@ Règles du scénario garanties par le code (`src/lib/vierges.ts`, `src/elements/
 exactement **dix** vierges (5 sages, 5 folles), aucune maison pendant l'attente, l'époux
 n'apparaît qu'avec sa procession.
 
-## Musique et plans réalistes
+## Plans IA réalistes
 
-Les images sont dessinées procéduralement (SVG). Pour un rendu photo-réaliste, placez vos
-plans filmés ou générés (Veo, Runway, Sora…) dans `public/` et indiquez leur nom dans les
-props de `AuMilieuDeLaNuit` (Studio → panneau Props, ou `src/Root.tsx`) :
+Le film est découpé en **46 plans** (`src/lib/decoupage.ts`). Pour chaque plan, déposez une
+vidéo ou une image générée par IA dans `public/plans/` sous le nom de son identifiant
+(`01-01.mp4`, `03-04.jpg`…) : elle remplace automatiquement la version dessinée, au bon
+moment et à la bonne durée. Les sous-titres, le grain, les bandes cinéma et le message final
+restent ajoutés par le montage.
 
-- `musique` : ex. `"musique.mp3"` (fondu d'entrée et de sortie automatique) ;
-- `plans.attente`, `plans.sommeil`, … : un fichier vidéo par scène, qui remplace la version
-  dessinée tout en gardant le minutage, les bandes cinéma et le grain.
+👉 **Les prompts de chaque plan, les fiches personnages et la méthode sont dans [PROMPTS.md](PROMPTS.md).**
+
+## Musique
+
+Déposez un fichier dans `public/` et indiquez son nom dans la prop `musique` de
+`AuMilieuDeLaNuit` (ex. `"musique.mp3"`) : fondu d'entrée et de sortie automatique.

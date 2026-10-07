@@ -1,23 +1,10 @@
 import React from "react";
-import { AbsoluteFill, staticFile, useVideoConfig } from "remotion";
-import { Video } from "@remotion/media";
+import { AbsoluteFill } from "remotion";
 
-// Si un plan filmé / généré (fichier dans public/) est fourni, il remplace
-// la version procédurale de la scène. Sinon on affiche la scène dessinée.
-export const Plan: React.FC<{
-  readonly footage?: string;
-  readonly children: React.ReactNode;
-}> = ({ footage, children }) => {
-  const { fps } = useVideoConfig();
-  if (!footage) {
-    return <AbsoluteFill style={{ backgroundColor: "#000" }}>{children}</AbsoluteFill>;
-  }
-  return (
-    <AbsoluteFill style={{ backgroundColor: "#000" }}>
-      <Video src={staticFile(footage)} muted objectFit="cover" premountFor={fps} style={{ width: "100%", height: "100%" }} />
-    </AbsoluteFill>
-  );
-};
+// Fond noir commun à chaque scène dessinée.
+export const Plan: React.FC<{ readonly children: React.ReactNode }> = ({ children }) => (
+  <AbsoluteFill style={{ backgroundColor: "#000" }}>{children}</AbsoluteFill>
+);
 
 // Fondu d'entrée / de sortie (en images) pour un plan.
 export const Fondu: React.FC<{

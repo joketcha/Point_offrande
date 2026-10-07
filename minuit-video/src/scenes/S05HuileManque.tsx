@@ -6,7 +6,6 @@ import { Landscape } from "../elements/Landscape";
 import { Mist } from "../elements/Mist";
 import { Groupe } from "../elements/Groupe";
 import { LampCloseUp } from "../elements/LampCloseUp";
-import { Subtitle } from "../elements/Text";
 import { Plan } from "../elements/Plan";
 import { MOYEN, type Pose } from "../lib/layouts";
 import { VIERGES } from "../lib/vierges";
@@ -23,11 +22,11 @@ const AU_BORD: readonly Pose[] = [
   { x: 1720, y: 1040, scale: 1.4, facing: 1 },
 ];
 
-export const S05HuileManque: React.FC<{ readonly footage?: string }> = ({ footage }) => {
+export const S05HuileManque: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   return (
-    <Plan footage={footage}>
+    <Plan>
       <Series>
         <Series.Sequence name="Pas assez d'huile" durationInFrames={5 * fps} premountFor={fps}>
           <LampCloseUp
@@ -64,8 +63,6 @@ export const S05HuileManque: React.FC<{ readonly footage?: string }> = ({ footag
                 }}
               />
             </Stage>
-            <Subtitle from={0.5 * fps} to={3.8 * fps}>« Donnez-nous de votre huile, car nos lampes s'éteignent. »</Subtitle>
-            <Subtitle from={4.3 * fps} to={7.8 * fps}>« Il n'y en aurait pas assez pour nous et pour vous. »</Subtitle>
           </AbsoluteFill>
         </Series.Sequence>
         <Series.Sequence name="La lumière de l'époux au loin" durationInFrames={6 * fps} premountFor={fps}>

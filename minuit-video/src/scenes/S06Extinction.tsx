@@ -75,11 +75,11 @@ const Travelling: React.FC = () => {
   );
 };
 
-export const S06Extinction: React.FC<{ readonly footage?: string }> = ({ footage }) => {
+export const S06Extinction: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   return (
-    <Plan footage={footage}>
+    <Plan>
       <Series>
         <Series.Sequence name="Les cinq lampes s'éteignent" durationInFrames={13 * fps} premountFor={fps}>
           <Travelling />

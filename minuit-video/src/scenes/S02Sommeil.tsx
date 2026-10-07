@@ -12,12 +12,12 @@ import { clamp, lent, tween } from "../lib/util";
 // Ordre dans lequel elles s'assoient : une première, puis une deuxième, puis les autres.
 const ORDRE = [6, 2, 8, 0, 4, 9, 3, 5, 1, 7];
 
-export const S02Sommeil: React.FC<{ readonly footage?: string }> = ({ footage }) => {
+export const S02Sommeil: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const montee = tween(frame, [11 * fps, 20 * fps], [0, 1]);
   return (
-    <Plan footage={footage}>
+    <Plan>
       <Fondu frame={frame} dur={20 * fps} fadeIn={10}>
         <AbsoluteFill
           style={{

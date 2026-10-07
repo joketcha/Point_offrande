@@ -7,7 +7,6 @@ import { Mist } from "../elements/Mist";
 import { Groupe } from "../elements/Groupe";
 import { Profile } from "../elements/Profile";
 import { Watchman } from "../elements/People";
-import { Subtitle } from "../elements/Text";
 import { Plan } from "../elements/Plan";
 import { LOINTAIN, MOYEN } from "../lib/layouts";
 import { VIERGES } from "../lib/vierges";
@@ -52,11 +51,11 @@ const Hauteur: React.FC<{ readonly t0: number; readonly cri: boolean }> = ({ t0,
   );
 };
 
-export const S03Cri: React.FC<{ readonly footage?: string }> = ({ footage }) => {
+export const S03Cri: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   return (
-    <Plan footage={footage}>
+    <Plan>
       <Series>
         <Series.Sequence name="Silence dramatique" durationInFrames={3 * fps} premountFor={fps}>
           <AbsoluteFill style={{ filter: "brightness(0.8)" }}>
@@ -85,7 +84,6 @@ export const S03Cri: React.FC<{ readonly footage?: string }> = ({ footage }) => 
         </Series.Sequence>
         <Series.Sequence name="Le cri" durationInFrames={4 * fps} premountFor={fps}>
           <Hauteur t0={9 * fps} cri />
-          <Subtitle from={10} to={4 * fps}>« Voici l'époux ! Allez à sa rencontre ! »</Subtitle>
         </Series.Sequence>
         <Series.Sequence name="Les yeux s'ouvrent" durationInFrames={1.5 * fps} premountFor={fps}>
           <Profile

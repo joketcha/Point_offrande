@@ -94,11 +94,11 @@ const Majestueux: React.FC = () => {
   );
 };
 
-export const S07Epoux: React.FC<{ readonly footage?: string }> = ({ footage }) => {
+export const S07Epoux: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   return (
-    <Plan footage={footage}>
+    <Plan>
       <Series>
         <Series.Sequence name="Une magnifique procession au loin" durationInFrames={7 * fps} premountFor={fps}>
           <Approche />

@@ -51,11 +51,11 @@ const Flammes: React.FC = () => {
   );
 };
 
-export const S01Attente: React.FC<{ readonly footage?: string }> = ({ footage }) => {
+export const S01Attente: React.FC = () => {
   const { fps } = useVideoConfig();
   const frame = useCurrentFrame();
   return (
-    <Plan footage={footage}>
+    <Plan>
       <Series>
         <Series.Sequence name="Plan très large" durationInFrames={6 * fps} premountFor={fps}>
           <PlanLarge />

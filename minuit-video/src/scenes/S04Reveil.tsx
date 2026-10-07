@@ -16,11 +16,11 @@ import { bruit, clamp, lent, tween } from "../lib/util";
 export const faiblit = (frame: number, seed: string, base: number) =>
   Math.max(0, base * (0.75 + 0.35 * bruit(seed, frame, 0.35)));
 
-export const S04Reveil: React.FC<{ readonly footage?: string }> = ({ footage }) => {
+export const S04Reveil: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   return (
-    <Plan footage={footage}>
+    <Plan>
       <Series>
         <Series.Sequence name="Elles prennent leurs lampes" durationInFrames={6 * fps} premountFor={fps}>
           <AbsoluteFill style={{ scale: interpolate(frame, [0, 6 * fps], [1.05, 1.12], { ...clamp, easing: lent }) }}>
